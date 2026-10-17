@@ -1,0 +1,29 @@
+# MinIO / DB volumes
+object-storage-server/data/**
+!object-storage-server/data/.gitkeep
+
+# Secrets / env
+.env
+.env.*
+!.env.example
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Cursor — không đưa ngữ cảnh / ghi nhớ / chat lên Git
+.cursor/
+.cursorrules
+*.cursor*
+AGENTS.md
+agent-transcripts/
+.agent/
+.agents/
+
+# Logs / temp
+*.log
+tmp/
+.temp/

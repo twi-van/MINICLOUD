@@ -1,19 +1,34 @@
 # MyMiniCloud
 
-Mô phỏng hệ thống cloud thu nhỏ gồm 9 server (Docker), chung mạng `cloud-net`.
+Mô phỏng hạ tầng cloud thu nhỏ (**9 loại server**) bằng Docker, mạng chung `cloud-net`, gắn **ứng dụng mini E2E** (list → login → API → DB → ảnh).
+
+**Stack:** React + NestJS + PostgreSQL + Keycloak + MinIO + Bind9 + Prometheus + Grafana/Loki + Nginx Proxy/LB.
 
 ## Thành viên
 
-
-| Họ tên | Phụ trách                                         |
-| ------ | ------------------------------------------------- |
-| Hân    | Web, DNS + khung/format Word                      |
-| Vân    | Proxy, App, Load Balancing                        |
-| Lợi    | DB, Auth, MinIO                                   |
-| Bảo    | Prometheus, Grafana, EC2, Docker Hub, video, ping |
-
+| Họ tên | Phụ trách |
+| ------ | --------- |
+| Hân | Web (**React**) + DNS + khung/format Word |
+| Vân | Proxy + App (**NestJS**) + Load Balancing |
+| Lợi | DB (**PostgreSQL**) + Auth (Keycloak) + MinIO |
+| Bảo | Prometheus + Grafana + Loki/Promtail + EC2 + Docker Hub + video + ping |
 
 Chi tiết: xem `PHAN_CONG_NHOM.md`.
+
+## Stack nhanh
+
+| Server | Công nghệ |
+| ------ | --------- |
+| Web | React build → Nginx |
+| App | NestJS (scale ≥ 2 instance) |
+| Database | PostgreSQL |
+| Auth | Keycloak (login trên UI) |
+| Object storage | MinIO |
+| DNS | Bind9 (`cloud.local`) |
+| Monitoring | Prometheus + Node Exporter |
+| Visualization | Grafana + Loki + Promtail |
+| Proxy / LB | Nginx (route + Round Robin app) |
+| Thêm (tuỳ chọn) | Redis, Alertmanager… |
 
 ## Cấu trúc
 
@@ -21,52 +36,42 @@ Chi tiết: xem `PHAN_CONG_NHOM.md`.
 cloud/
 ├── README.md
 ├── PHAN_CONG_NHOM.md
-├── .gitignore
-├── web-frontend-server/html/blog/          ← Hân
-├── internal-dns-server/                    ← Hân
-├── api-gateway-proxy-server/               ← Vân
-├── application-backend-server/             ← Vân
-├── relational-database-server/init/        ← Lợi
-├── authentication-identity-server/         ← Lợi
-├── object-storage-server/data/             ← Lợi
-├── monitoring-prometheus-server/           ← Bảo
-├── monitoring-grafana-dashboard-server/    ← Bảo
+├── docker-compose.yml              ← Bảo merge
+├── web-frontend-server/            ← Hân (React)
+├── internal-dns-server/            ← Hân
+├── api-gateway-proxy-server/       ← Vân
+├── application-backend-server/     ← Vân (NestJS)
+├── relational-database-server/     ← Lợi (Postgres)
+├── authentication-identity-server/ ← Lợi
+├── object-storage-server/          ← Lợi
+├── monitoring-prometheus-server/   ← Bảo
+├── monitoring-grafana-dashboard-server/ ← Bảo
 └── docs/screenshots/
 ```
 
-
-
 ## Cổng dịch vụ
 
-
-| Service             | Port host   |
-| ------------------- | ----------- |
-| Proxy (API Gateway) | 80          |
-| Web                 | 8080        |
-| Auth (Keycloak)     | 8081        |
-| App API             | 8085        |
-| Grafana             | 3000        |
+| Service | Port host |
+| ------- | --------- |
+| Proxy (API Gateway) | 80 |
+| Web | 8080 |
+| Auth (Keycloak) | 8081 |
+| App API | 8085 (container 8081) |
+| Grafana | 3000 |
 | MinIO API / Console | 9000 / 9001 |
-| Prometheus          | 9090        |
-| Node Exporter       | 9100        |
-| DNS                 | 1053/udp    |
-| MariaDB             | 3306        |
+| Prometheus | 9090 |
+| Node Exporter | 9100 |
+| DNS | 1053/udp |
+| PostgreSQL | 5432 |
 
+## Tài khoản demo (mặc định)
 
-
-
-## Tài khoản demo (mặc định lab)
-
-
-| Dịch vụ  | User       | Password   |
-| -------- | ---------- | ---------- |
-| Keycloak | admin      | admin      |
-| Grafana  | admin      | admin      |
-| MinIO    | minioadmin | minioadmin |
-| MariaDB  | root       | root       |
-
-
-
+| Dịch vụ | User | Password |
+| ------- | ---- | -------- |
+| Keycloak | admin | admin |
+| Grafana | admin | admin |
+| MinIO | minioadmin | minioadmin |
+| PostgreSQL | *(theo compose / `.env`)* | *(theo compose / `.env`)* |
 
 ## Chạy local
 
@@ -83,38 +88,36 @@ Dừng:
 docker compose down
 ```
 
-
-
 ## Kiểm thử nhanh
 
 ```bash
-# Web
-curl -I http://localhost:8080/
-curl -I http://localhost:8080/blog/
-
-# App (trực tiếp + qua proxy)
-curl http://localhost:8085/hello
-curl http://localhost/api/hello
-
-# Proxy
+# Qua proxy
 curl -I http://localhost/
+curl -s  http://localhost/api/hello   # hoặc health/rooms tùy NestJS
 curl -I http://localhost/auth/
+
+# Web / App trực tiếp
+curl -I http://localhost:8080/
+curl -s  http://localhost:8085/hello  # hoặc endpoint tương đương
 
 # DNS
 dig @127.0.0.1 -p 1053 web-frontend-server.cloud.local +short
 ```
 
-- Prometheus: [http://localhost:9090](http://localhost:9090) → Status → Targets  
-- Grafana: [http://localhost:3000](http://localhost:3000)  
-- MinIO: [http://localhost:9001](http://localhost:9001)  
-- Keycloak: [http://localhost:8081](http://localhost:8081)
+- Prometheus: http://localhost:9090 → Status → Targets  
+- Grafana: http://localhost:3000  
+- MinIO: http://localhost:9001  
+- Keycloak: http://localhost:8081  
 
+## Phân công mở rộng / E2E (tóm tắt)
 
+- **Hân (1,0đ):** UI React E2E + DNS records (+ map mở rộng Web nếu cần)  
+- **Vân (1,5đ):** NestJS API + proxy routes + LB Round Robin nhiều app  
+- **Lợi (1,5đ):** Postgres schema/CRUD + Keycloak realm gắn UI + MinIO ảnh  
+- **Bảo (1,0đ):** scrape/dashboard/Loki + EC2 + Docker Hub + video  
 
-## Phân công mở rộng (tóm tắt)
+## Link nộp (điền sau)
 
-- **Hân (1,0đ):** blog 3 bài, DNS records  
-- **Vân (1,5đ):** API `/student`, route `/student/`, LB Round Robin  
-- **Lợi (1,5đ):** `studentdb`, Keycloak realm, MinIO buckets  
-- **Bảo (1,0đ):** scrape Prometheus web, Grafana dashboard (+ EC2 / Hub / video)
-
+- Docker Hub: _[...]_
+- Video demo: _[...]_
+- AWS EC2 public IP: _[...]_

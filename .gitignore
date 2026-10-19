@@ -27,3 +27,6 @@ agent-transcripts/
 *.log
 tmp/
 .temp/
+
+# Word lock / temp
+~\$*

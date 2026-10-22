@@ -142,21 +142,102 @@ Bảo tự vào file → viết + ảnh **Ch.3–4: Prometheus + Grafana (+ Loki
 
 
 
+## Deadline tổng (nộp trước **03/11/2026**)
+
+> Hôm nay: **22/10**. Còn **~12 ngày** → chốt nội bộ **02/11 tối** (đệm 1 ngày trước hạn 03/11).
+
+
+| Mốc         | Ngày            | Mục tiêu cả nhóm                                                       |
+| ----------- | --------------- | ---------------------------------------------------------------------- |
+| **S1 xong** | **25/10 (CN)**  | Mỗi người demo riêng + ảnh; Vân App/Proxy đã xong → người khác bắt kịp |
+| **S2 xong** | **28/10 (T4)**  | `compose up` đủ 9 server + ping → **~5 điểm**                          |
+| **S3 xong** | **31/10 (T7)**  | E2E + mở rộng chính + EC2 + Hub + video quay xong                      |
+| **S4 xong** | **02/11 (CN)**  | Word đủ Ch.1–5 + Phụ lục, format xong, sẵn sàng nộp                    |
+| **Nộp**     | **Trước 03/11** | Theo LMS / GV                                                          |
+
+
+---
+
+
+
+## Deadline theo từng người
+
+
+
+### Hân
+
+
+| Deadline  | Việc                                                                       |
+| --------- | -------------------------------------------------------------------------- |
+| **24/10** | React Home build → Nginx chạy `:8080`; DNS `dig` OK + ảnh                  |
+| **27/10** | Web gắn compose; vào được qua proxy `/`                                    |
+| **30/10** | UI E2E (list → login → chi tiết/ảnh); DNS records mở rộng; map mở rộng Web |
+| **01/11** | Khung Word + Ch.1, Ch.2, Ch.3–4 Web/DNS (nháp)                             |
+| **02/11** | Format cuối toàn bài                                                       |
+
+
+
+
+### Vân 
+
+
+| Deadline | Việc |
+| -------- | ---- |
+| **24/10** | Push Git App+Proxy+screenshot; API `/student` + ảnh |
+| **27/10** | Test qua proxy `/api/hello`, `/api/student` khi có compose |
+| **30/10** | LB ≥ 2 NestJS Round Robin; route mở rộng; API gắn DB nếu Lợi sẵn |
+| **01/11** | Viết Ch.3–4 App/Proxy/LB + Ch.5 (nháp vào Word) |
+| **02/11** | Chỉnh sửa theo feedback Hân format |
+
+
+
+
+### Lợi
+
+
+| Deadline  | Việc                                                        |
+| --------- | ----------------------------------------------------------- |
+| **24/10** | Postgres + schema mẫu; Keycloak admin; MinIO upload + ảnh   |
+| **27/10** | Gắn compose; `/auth/` OK; hỗ trợ token                      |
+| **30/10** | Realm/client gắn UI; MinIO buckets ảnh; CRUD/map mở rộng DB |
+| **01/11** | Ch.3–4 DB/Auth/MinIO + Ch.5 nháp                            |
+| **02/11** | Chỉnh sửa cuối                                              |
+
+
+
+
+### Bảo
+
+
+| Deadline     | Việc                                                                        |
+| ------------ | --------------------------------------------------------------------------- |
+| **24/10**    | Prometheus + Node Exporter + Grafana lên + ảnh                              |
+| **26/10**    | `docker-compose.yml` **xương** gắn đủ service (ưu tiên App/Proxy Vân đã có) |
+| **28/10**    | Compose full 9 server; log ping; điều phối test S2                          |
+| **30–31/10** | Loki; dashboard; **Docker Hub**; **EC2** public IP; **quay video**          |
+| **01/11**    | Ch.3–4 monitoring/EC2; điền Phụ lục (Hub, video, IP, log)                   |
+| **02/11**    | Check list nộp với cả nhóm                                                  |
+
+
+---
+
+
+
 ## Các sprint làm việc
 
 
 
-### Sprint 1 — Build riêng từng server (demo cơ bản)
+### Sprint 1 — Build riêng — **deadline 25/10**
 
-**Mục tiêu:** Mỗi người chạy được phần mình (chưa cần full cụm / chưa cần E2E hoàn chỉnh).
+**Mục tiêu:** Mỗi người chạy được phần mình (chưa cần full cụm).
 
 
-| Người   | Việc                                                                   |
-| ------- | ---------------------------------------------------------------------- |
-| **Hân** | React Hello/Home build được trong Nginx; DNS zone + `dig` OK           |
-| **Vân** | NestJS health/`/hello` (hoặc tương đương) + Dockerfile; skeleton proxy |
-| **Lợi** | Postgres lên + schema trống/mẫu; Keycloak admin; MinIO console         |
-| **Bảo** | Prometheus + Node Exporter; Grafana `:3000`                            |
+| Người   | Việc                                                          |
+| ------- | ------------------------------------------------------------- |
+| **Hân** | React Hello/Home → Nginx; DNS + `dig`                         |
+| **Vân** | NestJS `/hello` + Dockerfile; Proxy nginx *(ưu tiên đã xong)* |
+| **Lợi** | Postgres + Keycloak admin + MinIO console                     |
+| **Bảo** | Prometheus + Node Exporter + Grafana `:3000`                  |
 
 
 **Done khi:** Mỗi người có ảnh/log demo phần mình.
@@ -165,75 +246,71 @@ Bảo tự vào file → viết + ảnh **Ch.3–4: Prometheus + Grafana (+ Loki
 
 
 
-### Sprint 2 — Ghép cụm + đủ 5 điểm demo đề
+### Sprint 2 — Ghép cụm ~5 điểm — **deadline 28/10**
 
-**Mục tiêu:** `docker compose up` chạy **đủ 9 loại server**, test checklist đề (cổng/proxy/ping…).
-
-
-| Người       | Việc                                                          |
-| ----------- | ------------------------------------------------------------- |
-| **Bảo**     | Merge `docker-compose.yml` + `cloud-net`; điều phối test full |
-| **Hân**     | Gắn Web + DNS; web vào được qua proxy `/`                     |
-| **Vân**     | Gắn App + Proxy; `/api/...`, `/`, `/auth/` OK                 |
-| **Lợi**     | Gắn DB + Auth + MinIO; hỗ trợ login / token                   |
-| **Cả nhóm** | Ping các server trong `cloud-net` (Bảo ghi log)               |
+**Mục tiêu:** `docker compose up` đủ 9 server + checklist đề.
 
 
-**Done khi:** Đủ demo 9 server + ping → **~5 điểm** đề.
-
----
-
-
-
-### Sprint 3 — E2E app + mở rộng đề + deploy
-
-**Mục tiêu:** Flow người dùng xuyên suốt; map đủ mục mở rộng đề; EC2.
+| Người       | Việc                                                        |
+| ----------- | ----------------------------------------------------------- |
+| **Bảo**     | Merge compose + `cloud-net` (**compose xương trước 26/10**) |
+| **Hân**     | Gắn Web + DNS; proxy `/`                                    |
+| **Vân**     | Gắn App + Proxy; `/api/...`, `/`, `/auth/`                  |
+| **Lợi**     | Gắn DB + Auth + MinIO                                       |
+| **Cả nhóm** | Ping `cloud-net` (Bảo ghi log)                              |
 
 
-| Người   | Việc                                                                                             |
-| ------- | ------------------------------------------------------------------------------------------------ |
-| **Hân** | UI E2E (list + login + chi tiết/ảnh); DNS records mở rộng; hỗ trợ chứng minh mở rộng Web         |
-| **Vân** | API nghiệp vụ + scale NestJS; LB Round Robin; route mở rộng (vd `/student/` nếu vẫn làm theo đề) |
-| **Lợi** | Schema/data thật; Keycloak realm/client gắn web; MinIO buckets + URL ảnh; CRUD/map mở rộng DB    |
-| **Bảo** | Loki/Promtail + Grafana dashboard; scrape thêm; **Docker Hub** + **EC2** + **video** E2E         |
-
-
-**Done khi:** Ghi được **X/10** phần mở rộng đề; có video flow E2E; EC2 public IP chạy được.
+**Done khi:** Demo 9 server + ping → **~5 điểm**.
 
 ---
 
 
 
-### Sprint 4 — Báo cáo Word + nộp
+### Sprint 3 — E2E + mở rộng + deploy — **deadline 31/10**
 
-**Mục tiêu:** Hoàn thiện báo cáo và nộp.
-
-
-| Người   | Việc                                                                  |
-| ------- | --------------------------------------------------------------------- |
-| **Hân** | Khung Word + format; Ch.1, Ch.2, Ch.3–4 Web/DNS; format cuối          |
-| **Vân** | Tự viết Ch.3–4 Proxy/App/LB + Ch.5 phần mình                          |
-| **Lợi** | Tự viết Ch.3–4 DB/Auth/MinIO + Ch.5 phần mình                         |
-| **Bảo** | Tự viết Ch.3–4 monitoring/log/EC2; điền Phụ lục (Hub, video, IP, log) |
+**Mục tiêu:** Flow E2E; mở rộng; EC2 + Hub + video.
 
 
-**Done khi:** Word đủ Ch.1–5 + Phụ lục; Git + Docker Hub + video → nộp.
+| Người   | Việc                                     |
+| ------- | ---------------------------------------- |
+| **Hân** | UI E2E; DNS mở rộng                      |
+| **Vân** | API + LB Round Robin; route `/student/`… |
+| **Lợi** | Schema/OIDC/MinIO thật                   |
+| **Bảo** | Loki + Hub + **EC2** + **video**         |
+
+
+**Done khi:** Ghi **X/10** mở rộng; video + EC2 IP chạy được.
 
 ---
 
 
 
-### Checklist nộp
+### Sprint 4 — Báo cáo — **deadline 02/11** (nộp trước 03/11)
+
+
+| Người   | Việc                                                     |
+| ------- | -------------------------------------------------------- |
+| **Hân** | Khung Word + format; Ch.1–2; Ch.3–4 Web/DNS; format cuối |
+| **Vân** | Ch.3–4 Proxy/App/LB + Ch.5                               |
+| **Lợi** | Ch.3–4 DB/Auth/MinIO + Ch.5                              |
+| **Bảo** | Ch.3–4 monitoring/EC2; Phụ lục                           |
+
+
+**Done khi:** Word đủ + Git + Hub + video → nộp.
+
+---
+
+
+
+### Checklist nộp (chốt **02/11**)
 
 - [ ] 9 loại server chạy (local + EC2)
-- [ ] Mini app E2E demo được (ít nhất 1 flow người dùng)
+- [ ] Mini app E2E demo được
 - [ ] ≥ 1 image Docker Hub
 - [ ] Video + log ping
-- [ ] Word đủ Ch.1–5 + Phụ lục; mỗi người đã tự viết phần mình
+- [ ] Word Ch.1–5 + Phụ lục; mỗi người tự viết phần mình
 - [ ] Format thống nhất (Hân)
-- [ ] Ghi rõ số phần mở rộng đề đã làm (+ phần stack thêm: Redis/Loki/scale…)
+- [ ] Ghi rõ số phần mở rộng đã làm
 
 ---
-
-
 

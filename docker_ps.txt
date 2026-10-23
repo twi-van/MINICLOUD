@@ -1,0 +1,7 @@
+NAME                                  IMAGE                       COMMAND                  SERVICE                               CREATED          STATUS          PORTS
+loki                                  grafana/loki:latest         "/usr/bin/loki -conf…"   loki                                  12 minutes ago   Up 12 minutes   0.0.0.0:3100->3100/tcp, [::]:3100->3100/tcp
+monitoring-grafana-dashboard-server   grafana/grafana:latest      "/run.sh"                monitoring-grafana-dashboard-server   12 minutes ago   Up 12 minutes   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+monitoring-node-exporter-server       prom/node-exporter:latest   "/bin/node_exporter"     monitoring-node-exporter-server       12 minutes ago   Up 12 minutes   0.0.0.0:9100->9100/tcp, [::]:9100->9100/tcp
+monitoring-prometheus-server          mini-cloud-prometheus:v1    "/bin/prometheus --c…"   monitoring-prometheus-server          12 minutes ago   Up 12 minutes   0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp
+promtail                              grafana/promtail:latest     "/usr/bin/promtail -…"   promtail                              12 minutes ago   Up 12 minutes   
+redis-cache-server                    redis:7-alpine              "docker-entrypoint.s…"   redis-cache-server                    12 minutes ago   Up 12 minutes   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp

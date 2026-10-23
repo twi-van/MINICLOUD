@@ -1,0 +1,22 @@
+services:
+  relational-database-server:
+    image: postgres:16-alpine
+    container_name: relational-database-server
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: minicloud
+      POSTGRES_USER: minicloud
+      POSTGRES_PASSWORD: minicloud_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U minicloud -d minicloud"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres_data:

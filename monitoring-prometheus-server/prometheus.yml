@@ -2,17 +2,22 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  # 1. Tự giám sát Prometheus
+  # 1. Tu giam sat Prometheus
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
-  # 2. Giám sát Node Exporter 
+  # 2. Giam sat Node Exporter
   - job_name: 'node'
     static_configs:
       - targets: ['monitoring-node-exporter-server:9100']
 
-  # 3. Giám sát Web & App 
-  - job_name: 'web'
+  # 3. Giam sat Grafana
+  - job_name: 'grafana'
     static_configs:
-      - targets: ['web-frontend-server:80']
+      - targets: ['monitoring-grafana-dashboard-server:3000']
+
+  # 4. Giam sat Loki
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']

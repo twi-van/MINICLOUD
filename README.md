@@ -116,8 +116,8 @@ dig @127.0.0.1 -p 1053 web-frontend-server.cloud.local +short
 - **Lợi (1,5đ):** Postgres schema/CRUD + Keycloak realm gắn UI + MinIO ảnh  
 - **Bảo (1,0đ):** scrape/dashboard/Loki + EC2 + Docker Hub + video  
 
-## Link nộp (điền sau)
+## Link nộp
 
-- Docker Hub: _[...]_
-- Video demo: _[...]_
-- AWS EC2 public IP: _[...]_
+- **Docker Hub:** [baomache/myminicloud-prometheus:v1](https://hub.docker.com/repository/docker/baomache/myminicloud-prometheus/tags)
+- **AWS EC2 Public IP:** `13.250.19.3`
+- **Video demo:** *[Đang cập nhật / Chèn link YouTube hoặc Drive vào đây]*

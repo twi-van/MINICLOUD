@@ -1,0 +1,564 @@
+/* Interaction and animation are independent of the visual theme. */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--color-brand);
+  transform-origin: 0%;
+  z-index: 1001;
+  pointer-events: none;
+}
+.route-stage {
+  min-height: 50vh;
+}
+.brand-symbol {
+  transition: transform 0.3s;
+}
+.brand:hover .brand-symbol {
+  transform: rotate(7deg);
+}
+.header-favorites {
+  transition:
+    color 0.2s,
+    transform 0.2s;
+}
+.header-favorites:hover {
+  color: var(--color-brand);
+  transform: rotate(-10deg);
+}
+.text-link {
+  transition:
+    gap 0.25s,
+    color 0.25s;
+}
+.text-link:hover {
+  gap: 19px;
+}
+.room-hover-link {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.25s,
+    transform 0.25s;
+}
+.room-card:hover .room-hover-link,
+.room-card:focus-within .room-hover-link {
+  opacity: 1;
+  transform: translateY(0);
+}
+.room-arrow {
+  transition:
+    background 0.25s,
+    transform 0.25s;
+}
+.room-card:hover .room-arrow {
+  background: var(--color-brand);
+  color: white;
+  transform: rotate(-35deg);
+}
+.save-burst {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  pointer-events: none;
+  z-index: 3;
+}
+.save-burst i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: var(--color-brand);
+  border-radius: 50%;
+  animation: heart-burst 0.6s ease-out both;
+}
+.save-burst i:nth-child(even) {
+  background: #d6c2aa;
+}
+.area-card {
+  transition:
+    box-shadow 0.3s,
+    transform 0.3s;
+}
+.area-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px #203b4b18;
+}
+.quiz-option {
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
+}
+.quiz-option:hover {
+  transform: translateX(3px);
+}
+.quick-result {
+  transition: background 0.16s;
+}
+.room-quick-filters button {
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    border-color 0.2s;
+}
+.room-quick-filters button:hover {
+  transform: translateY(-2px);
+  border-color: #cdb49f;
+}
+.cta-button {
+  transition:
+    gap 0.3s,
+    background 0.3s;
+}
+.cta-button:hover {
+  gap: 22px;
+}
+.detail-gallery .ant-image-img {
+  transition: transform 0.5s;
+}
+.detail-gallery .ant-image:hover .ant-image-img {
+  transform: scale(1.03);
+}
+.ant-btn {
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.ant-btn:not(:disabled):active {
+  transform: scale(0.97);
+}
+@keyframes heart-burst {
+  from {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(-8px) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-38px) scale(0.2);
+  }
+}
+@keyframes float-up {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -9px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .float-slow {
+    animation: float-up 6s ease-in-out infinite;
+  }
+  .float-offset {
+    animation: float-up 7s ease-in-out infinite reverse;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .save-burst,
+  .scroll-progress {
+    display: none;
+  }
+  .hero-visual {
+    transform: none !important;
+  }
+  .area-card:hover,
+  .quiz-option:hover,
+  .room-quick-filters button:hover {
+    transform: none;
+  }
+}
+
+/* Motion follows the same restrained rhythm on all routes. */
+.student-stat,
+.blog-card,
+.filter-panel,
+.benefit-icon,
+.major-tag {
+  transition:
+    transform 220ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+.student-stat:hover {
+  transform: translateY(-4px);
+}
+.student-stat:hover .benefit-icon {
+  transform: rotate(-5deg);
+}
+.benefit-strip > div:hover .benefit-icon {
+  transform: translateY(-3px);
+}
+
+.room-search {
+  transition: border-color 180ms ease;
+}
+.room-search:focus-within {
+  border-color: #bc7659;
+}
+.nav-link::after {
+  transition: transform 180ms ease;
+  transform-origin: left;
+}
+.site-footer a {
+  transition: color 180ms ease;
+}
+@keyframes minihome-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .page-intro {
+    animation: none;
+  }
+  .student-directory {
+    animation: minihome-enter 450ms ease both;
+  }
+  .student-directory .ant-table-tbody > tr {
+    animation: minihome-enter 350ms ease both;
+  }
+  .student-directory .ant-table-tbody > tr:nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .student-directory .ant-table-tbody > tr:nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .student-directory .ant-table-tbody > tr:nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .student-directory .ant-table-tbody > tr:nth-child(5) {
+    animation-delay: 160ms;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .student-stat:hover,
+  .student-stat:hover .benefit-icon,
+  .benefit-strip > div:hover .benefit-icon,
+  .popular-card:hover {
+    transform: none;
+  }
+}
+
+/* A masked light border keeps all content and controls unobstructed. */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+:is(
+  .student-stat,
+  .room-card,
+  .blog-card,
+  .cta-banner,
+  .popular-card,
+  .filter-panel,
+  .room-search,
+  .room-category-tabs,
+  .student-directory
+) {
+  position: relative;
+  isolation: isolate;
+}
+:is(
+  .student-stat,
+  .room-card,
+  .blog-card,
+  .cta-banner,
+  .popular-card,
+  .filter-panel,
+  .room-search,
+  .room-category-tabs,
+  .student-directory
+)::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      230px circle at var(--light-x, 50%) var(--light-y, 30%),
+      #d99a6e,
+      transparent 80%
+    ),
+    conic-gradient(from var(--glow-angle), #203b4b25, #b66b43b0, #c6a68945, #5e8c97a0, #203b4b25);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  transition: opacity 220ms ease;
+}
+:is(
+  .light-active,
+  .filter-panel:focus-within,
+  .room-search:focus-within,
+  .room-category-tabs:focus-within,
+  .student-directory:focus-within
+)::after {
+  opacity: 1;
+}
+@keyframes minihome-border-orbit {
+  to {
+    --glow-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :is(
+    .light-active,
+    .filter-panel:focus-within,
+    .room-search:focus-within,
+    .room-category-tabs:focus-within,
+    .student-directory:focus-within
+  )::after {
+    animation: minihome-border-orbit 5s linear infinite;
+  }
+}
+.header-join,
+.cta-button,
+.room-search > .ant-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.header-join::after,
+.cta-button::after,
+.room-search > .ant-btn::after {
+  content: '';
+  position: absolute;
+  inset: -30% -60%;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 40%, #ffffff45 50%, transparent 60%);
+  transform: translateX(-70%);
+}
+@keyframes minihome-sheen {
+  from {
+    transform: translateX(-70%);
+  }
+  to {
+    transform: translateX(70%);
+  }
+}
+@keyframes minihome-icon {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  40% {
+    transform: translateY(-5px) rotate(-8deg);
+  }
+  70% {
+    transform: translateY(-2px) rotate(5deg);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .header-join:hover::after,
+  .cta-button:hover::after,
+  .room-search > .ant-btn:hover::after,
+  .header-join:focus-visible::after,
+  .cta-button:focus-visible::after {
+    animation: minihome-sheen 750ms ease both;
+  }
+  .student-stat:hover .benefit-icon .anticon,
+  .benefit-strip > div:hover .benefit-icon .anticon {
+    animation: minihome-icon 650ms ease both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .light-active::after {
+    opacity: 0;
+  }
+}
+
+/* A slow iridescent reflection within the existing card bounds. */
+@keyframes minihome-hologram {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.22;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.45;
+  }
+}
+.student-stat::before,
+.cta-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 15%,
+    #ffffff18 35%,
+    #ffffff28 50%,
+    #ffffff10 65%,
+    transparent 85%
+  );
+  background-size: 250% 100%;
+  opacity: 0.25;
+}
+.student-stat > *,
+.cta-banner > * {
+  position: relative;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .student-stat::before,
+  .cta-banner::before {
+    animation: minihome-hologram 10s ease-in-out infinite;
+  }
+  .student-stat:nth-child(2)::before {
+    animation-delay: -3s;
+  }
+  .student-stat:nth-child(3)::before {
+    animation-delay: -6s;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .student-stat::before,
+  .cta-banner::before {
+    animation: none;
+    opacity: 0.15;
+  }
+}
+
+.hero-photo-note {
+  transition:
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+.hero-photo-note:hover {
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12px 30px #203b4b25;
+}
+.hero-photo-note:focus-visible {
+  outline: 3px solid var(--color-brand);
+  outline-offset: 4px;
+}
+
+/* Focus light uses shadows, never a wider border or a larger control. */
+:where(.ant-input, .ant-input-affix-wrapper, .ant-select, .ant-picker, .header-search) {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.ant-input:not(.ant-input-status-error):not([disabled]):hover,
+.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-status-error):not(
+    .ant-input-affix-wrapper-disabled
+  ):hover,
+.ant-picker:not(.ant-picker-disabled):hover,
+.header-search:hover {
+  border-color: #305467;
+  box-shadow:
+    0 0 0 2px #203b4b0b,
+    0 3px 12px #203b4b09;
+}
+.ant-input:not(.ant-input-status-error):focus,
+.ant-input-affix-wrapper-focused:not(.ant-input-affix-wrapper-status-error),
+.ant-select-focused:not(.ant-select-status-error),
+.ant-picker-focused:not(.ant-picker-status-error),
+.header-search:focus-visible {
+  border-color: #203b4b;
+  box-shadow:
+    0 0 0 3px #203b4b14,
+    0 0 18px #203b4b09;
+}
+.ant-input-affix-wrapper > .ant-input {
+  box-shadow: none !important;
+}
+.search-field .ant-select-focused {
+  border-radius: var(--radius-control);
+}
+:is(.room-card, .blog-card, .student-stat, .filter-panel):hover {
+  box-shadow:
+    0 8px 28px #203b4b0d,
+    0 0 16px #203b4b09;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.filter-panel, .room-search, .room-category-tabs, .student-directory):focus-within::after {
+    animation: none;
+  }
+}
+
+@keyframes minihome-note-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -5px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-photo-note {
+    animation: minihome-note-float 5s ease-in-out infinite;
+  }
+  .hero-photo-note:hover,
+  .hero-photo-note:focus-visible {
+    animation-play-state: paused;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-photo-note {
+    animation: none;
+    translate: none;
+  }
+}
+
+@keyframes minihome-daylight {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (min-width: 640px) {
+  .rooms-discovery-header::after {
+    animation: minihome-daylight 12s ease-in-out infinite;
+  }
+}
+
+.cta-banner::before {
+  background: radial-gradient(ellipse at 75% 50%, #9bbdca42, transparent 65%);
+  background-size: 160% 140%;
+  opacity: 0.4;
+}
+
+.cta-banner::before {
+  background: radial-gradient(
+    260px circle at var(--light-x, 50%) var(--light-y, 50%),
+    #d5e6ed65,
+    transparent 78%
+  );
+  background-size: auto;
+  animation: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.cta-banner.light-active::before {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cta-banner.light-active::before {
+    opacity: 0;
+  }
+}

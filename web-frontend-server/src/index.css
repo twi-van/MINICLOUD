@@ -1,0 +1,121 @@
+@import '@fontsource/be-vietnam-pro/400.css';
+@import '@fontsource/be-vietnam-pro/500.css';
+@import '@fontsource/be-vietnam-pro/600.css';
+@import '@fontsource/be-vietnam-pro/700.css';
+@layer theme, base, antd, components, utilities;
+@import 'tailwindcss';
+
+@theme {
+  --color-navy: #203b4b;
+  --color-brand: #b66b43;
+  --color-sand: #f5f6f7;
+  --color-muted: #737e84;
+  --color-line: #e5e7e3;
+  --font-sans: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+}
+
+:root {
+  --surface: #fff;
+  --surface-soft: #f5f6f7;
+  --radius-control: 8px;
+  --radius-surface: 12px;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+  }
+  body {
+    margin: 0;
+    background: #f7f5f0;
+    color: var(--color-navy);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  button,
+  a,
+  input,
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  :focus-visible {
+    outline: 3px solid #b66b43;
+    outline-offset: 4px;
+  }
+  ::selection {
+    background: #e9d7c5;
+    color: #203b4b;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply mx-auto w-full max-w-310 px-5 sm:px-8;
+  }
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.16em] text-brand;
+  }
+  .text-link {
+    @apply inline-flex items-center gap-3 text-sm font-semibold text-navy transition-colors hover:text-brand;
+  }
+  .section-space {
+    @apply py-13 md:py-17;
+  }
+  .section-heading {
+    @apply mb-8 flex flex-wrap items-end justify-between gap-5;
+  }
+  .section-heading h2 {
+    @apply mb-3 mt-3 text-[28px] font-semibold tracking-tight md:text-[32px];
+  }
+  .section-heading p {
+    @apply text-sm leading-6 text-muted;
+  }
+  .page-intro {
+    @apply pb-8 pt-10 md:pb-10 md:pt-14;
+  }
+  .page-intro h1 {
+    @apply mb-4 mt-3 text-3xl font-semibold tracking-tight md:text-[40px];
+  }
+  .page-intro p {
+    @apply text-sm leading-7 text-muted;
+  }
+  .room-card {
+    @apply relative min-w-0 rounded-2xl border border-line bg-white p-3.5 transition-shadow duration-300 hover:shadow-[0_12px_32px_#203b4b0c];
+  }
+  .save-button {
+    @apply absolute right-3 top-3 z-2 flex size-8 items-center justify-center rounded-full border-0 bg-white/95 text-base text-navy shadow-sm;
+  }
+  .save-button.is-saved {
+    @apply text-brand;
+  }
+  .filter-panel {
+    @apply rounded-2xl border border-line bg-white p-5;
+  }
+  .filter-label {
+    @apply mb-3 block text-sm font-semibold text-navy;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

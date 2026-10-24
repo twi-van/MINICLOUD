@@ -1,0 +1,20 @@
+services:
+  web-frontend-server:
+    build:
+      context: .
+      args:
+        VITE_DATA_SOURCE: ${VITE_DATA_SOURCE:-mock}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+    ports:
+      - '8080:80'
+    environment:
+      BACKEND_UPSTREAM: ${BACKEND_UPSTREAM:-host.docker.internal:8085}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    restart: unless-stopped
+    networks:
+      - cloud-net
+
+networks:
+  cloud-net:
+    name: cloud-net

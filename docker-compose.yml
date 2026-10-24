@@ -1,6 +1,7 @@
 networks:
   cloud-net:
     name: cloud-net
+    external: true
 
 services:
 
@@ -98,10 +99,24 @@ services:
     build:
       context: ./web-frontend-server
       dockerfile: Dockerfile
-    image: minicloud-web:stub
+    image: myminicloud-web:v1
     container_name: web-frontend-server
     ports:
       - "8080:80"
+    restart: unless-stopped
+    networks:
+      - cloud-net
+
+  # ── Internal DNS Server (Bind9) ── Hân ──────────────────────────────────────
+  internal-dns-server:
+    build:
+      context: ./internal-dns-server
+      dockerfile: Dockerfile
+    image: myminicloud-dns:v1
+    container_name: internal-dns-server
+    ports:
+      - "1053:53/udp"
+      - "1053:53/tcp"
     restart: unless-stopped
     networks:
       - cloud-net

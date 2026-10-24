@@ -1,0 +1,21 @@
+options {
+    directory "/var/cache/bind";
+
+    // Chỉ lắng nghe trên mọi interface (trong container)
+    listen-on { any; };
+    listen-on-v6 { any; };
+
+    // Cho phép query từ bất kỳ IP nào trong docker network
+    allow-query { any; };
+
+    // Forward các domain không biết ra internet
+    forwarders {
+        8.8.8.8;
+        8.8.4.4;
+    };
+
+    forward only;
+
+    dnssec-validation no;
+    recursion yes;
+};

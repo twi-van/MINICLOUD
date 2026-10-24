@@ -1,0 +1,40 @@
+; ─────────────────────────────────────────────────────────────────────────────
+; Zone file: db.cloud.local
+; Domain   : cloud.local
+; Network  : cloud-net (Docker bridge ~172.20.0.0/16)
+; ─────────────────────────────────────────────────────────────────────────────
+
+$TTL    604800
+$ORIGIN cloud.local.
+
+@   IN  SOA     ns1.cloud.local. admin.cloud.local. (
+                    2026102301  ; Serial  (YYYYMMDDnn)
+                    3600        ; Refresh (1 hour)
+                    1800        ; Retry   (30 min)
+                    604800      ; Expire  (1 week)
+                    86400 )     ; Negative Cache TTL (1 day)
+
+; ── Name Servers ─────────────────────────────────────────────────────────────
+@               IN  NS      ns1.cloud.local.
+
+; ── NS record ────────────────────────────────────────────────────────────────
+ns1             IN  A       172.20.0.2
+
+; ── 9 Server records (Demo cơ bản) ───────────────────────────────────────────
+web-frontend-server             IN  A   172.20.0.10
+application-backend-server      IN  A   172.20.0.11
+relational-database-server      IN  A   172.20.0.12
+authentication-identity-server  IN  A   172.20.0.13
+object-storage-server           IN  A   172.20.0.14
+internal-dns-server             IN  A   172.20.0.2
+monitoring-prometheus-server    IN  A   172.20.0.15
+monitoring-grafana-dashboard-server  IN  A   172.20.0.16
+api-gateway-proxy-server        IN  A   172.20.0.17
+
+; ── Mở rộng: tên ngắn tiện dùng ─────────────────────────────────────────────
+app-backend     IN  A   172.20.0.11
+minio           IN  A   172.20.0.14
+keycloak        IN  A   172.20.0.13
+grafana         IN  A   172.20.0.16
+prometheus      IN  A   172.20.0.15
+proxy           IN  A   172.20.0.17

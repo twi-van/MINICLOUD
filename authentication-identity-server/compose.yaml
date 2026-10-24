@@ -7,6 +7,7 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    # Host 8081 serves Keycloak; NestJS maps host 8085 to container 8081.
     ports:
       - "8081:8080"
     volumes:

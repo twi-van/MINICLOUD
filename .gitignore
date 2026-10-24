@@ -23,6 +23,11 @@ agent-transcripts/
 .agent/
 .agents/
 
+# Node (NestJS)
+node_modules/
+dist/
+npm-debug.log*
+
 # Logs / temp
 *.log
 tmp/

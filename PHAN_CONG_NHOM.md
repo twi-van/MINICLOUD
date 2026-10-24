@@ -2,315 +2,307 @@
 
 ---
 
-## Tổng quan vai trò
+## 1. Đề tài & nội dung ứng dụng (chốt chung)
+
+**Hạ tầng (theo đề):** MyMiniCloud — 9 loại server Docker, mạng `cloud-net`, local + AWS EC2.
+
+**Ứng dụng E2E (theo hướng bài mẫu + map đề):** mini app **xem / quản lý phòng trọ + sinh viên**  
+(giống tinh thần Airbnb mẫu, đơn giản hơn; vẫn đủ Blog + `/student` theo đề).
 
 
-| Họ tên  | MSSV    | Server phụ trách                     | Điểm mở rộng | Nhiệm vụ thêm                                               |
-| ------- | ------- | ------------------------------------ | ------------ | ----------------------------------------------------------- |
-| **Hân** | `[...]` | Web (React) + DNS                    | **1,0**      | **Khung & format Word**                                     |
-| **Vân** | `[...]` | Proxy + App (NestJS) + LB            | **1,5**      | Tự vào Word viết Ch.3–4 phần mình                           |
-| **Lợi** | `[...]` | DB (Postgres) + Auth + MinIO         | **1,5**      | Tự vào Word viết Ch.3–4 phần mình                           |
-| **Bảo** | `[...]` | Prometheus + Grafana + Loki/Promtail | **1,0**      | EC2 + video + Docker Hub + ping; tự vào Word viết phần mình |
+| Nguồn            | Web / App cần có                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| Đề lab           | Home + **Blog ≥ 3 bài**; API kiểu `/student`; đủ 9 server                                                   |
+| Bài mẫu điểm cao | List phòng → login → chi tiết + ảnh MinIO → API + DB                                                        |
+| **Nhóm chốt**    | Home, list/chi tiết **phòng trọ**, **Blog 3 bài**, **Login**, (tuỳ chọn) trang **sinh viên** gọi `/student` |
+
+
+**Câu mô tả dùng trong báo cáo Ch.1:**  
+*“Xây dựng MyMiniCloud 9 server và mini app quản lý/xem phòng trọ kết hợp thông tin sinh viên.”*
+
+---
+
+## 2. Nội dung Web (Hân làm FE) — danh sách trang
+
+
+| Trang                    | Mục đích              | Liên kết BE / dịch vụ                 |
+| ------------------------ | --------------------- | ------------------------------------- |
+| **Home**                 | Trang chủ, điều hướng | —                                     |
+| **Danh sách phòng**      | E2E giống mẫu         | API rooms (Vân) + data (Lợi)          |
+| **Chi tiết phòng**       | Xem mô tả + ảnh       | API + **MinIO** (Lợi)                 |
+| **Blog** (≥ 3 bài)       | Mở rộng đề Web        | Tĩnh hoặc route React                 |
+| **Login / Register**     | Auth E2E              | **Keycloak** (Lợi) qua proxy `/auth/` |
+| **Sinh viên** (tuỳ chọn) | Map đề `/student`     | API `/student` (Vân) đã có            |
+
+
+Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
+
+---
+
+## 3.  thống nhất nội dung Web 
+
+
+| Người       | Thống nhất gì với Hân                                             | Khi nào                             |
+| ----------- | ----------------------------------------------------------------- | ----------------------------------- |
+| **Vân**     | Contract API: path, JSON (`/hello`, `/student`, sau `/rooms`…)    | **S1 sớm** + chỉnh S2–S3            |
+| **Lợi**     | Login Keycloak (realm/client/URL); schema phòng/SV; URL ảnh MinIO | **S1** nghe chốt; **S3** E2E đầy đủ |
+| **Bảo**     | Tên service / port trong compose (ít đụng nội dung trang)         | S2 ghép cụm                         |
+| **Cả nhóm** | 1 lần chốt đề tài + danh sách trang ở trên                        | **Trước hết S1 (trước 25/10)**      |
+
+**File gửi Hân (có sẵn tin Zalo copy):** `docs/THONG_NHAT_FE_BE_HAN.md`
+
+---
+
+## 4. Stack kỹ thuật
+
+
+| Thành phần      | Công nghệ                              |
+| --------------- | -------------------------------------- |
+| Web             | **React** build → Nginx                |
+| App             | **NestJS** (scale ≥ 2 instance khi LB) |
+| Database        | **PostgreSQL**                         |
+| Auth            | Keycloak (login trên UI)               |
+| Object storage  | MinIO                                  |
+| DNS             | Bind9 (`cloud.local`)                  |
+| Monitoring      | Prometheus + Node Exporter             |
+| Visualization   | Grafana + Loki + Promtail              |
+| Proxy / LB      | Nginx                                  |
+| Thêm (tuỳ chọn) | Redis, Alertmanager…                   |
 
 
 ---
 
+## 5. Tổng quan vai trò
 
 
-## Hân — Web (React) + DNS + khung/format Word
-
-
-
-### Kỹ thuật
-
-
-| Server | Folder                 | Demo cơ bản                                                              | Mở rộng / E2E                                                                                                          |
-| ------ | ---------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Web    | `web-frontend-server/` | React app build → Nginx; port **8080**; trang Home + list dữ liệu từ API | UI đủ flow: xem list → login → xem chi tiết + ảnh; (map đề) có nội dung blog/trang tĩnh bổ sung nếu cần đủ mở rộng Web |
-| DNS    | `internal-dns-server/` | `dig` resolve tên nội bộ (vd web / app)                                  | Thêm A: `app-backend`, `minio`, `keycloak` (và tên app nếu có)                                                         |
-
-
-
-
-### Word — chỉ phần của Hân + khung/format
-
-- [ ] Tạo khung: bìa, mục lục, heading, style thống nhất
-- [ ] Viết **Ch.1** (giới thiệu & mục tiêu — nêu rõ stack E2E + mini app)
-- [ ] Viết / ghép **Ch.2** sơ đồ tổng (layers + request flow User → Proxy → React → Nest → …)
-- [ ] Tự viết **Ch.3–4: Web + DNS**
-- [ ] Cuối cùng: **format lại** toàn bài cho đồng bộ
-
----
-
-
-
-## Vân — Proxy + Application (NestJS) + LB
-
-
-
-### Kỹ thuật
-
-
-| Server         | Folder                        | Demo cơ bản                                                        | Mở rộng / E2E                                                                                |
-| -------------- | ----------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| App            | `application-backend-server/` | NestJS API (vd rooms/list, health); port **8085→8081**; Dockerfile | API nghiệp vụ + (map đề) endpoint kiểu `/student` hoặc tương đương; đọc DB/MinIO qua service |
-| Proxy          | `api-gateway-proxy-server/`   | Route `/` → web, `/api/` → app, `/auth/` → Keycloak                | Route thêm path nghiệp vụ; strip `/api/` đúng                                                |
-| Load Balancing | (compose + nginx upstream)    | —                                                                  | Round Robin **≥ 2 NestJS instance** (ideal 4 như bài mẫu)                                    |
-
-
-
-
-### Word
-
-Vân tự vào file → viết + ảnh **Ch.3–4: Proxy + App + LB**.  
-Góp **Ch.5** bullet phần mình.
-
-**Điểm mở rộng: 1,5**  
-**Lưu ý:** NestJS nặng — Sprint 1 có thể skeleton + 1 instance; Sprint 2–3 mới scale.
-
----
-
-
-
-## Lợi — Database (PostgreSQL) + Auth + MinIO
-
-
-
-### Kỹ thuật
-
-
-| Server | Folder                            | Demo cơ bản                                      | Mở rộng / E2E                                                                                          |
-| ------ | --------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| DB     | `relational-database-server/`     | PostgreSQL lên; schema + data mẫu (rooms/users…) | (map đề) thêm DB/bảng kiểu `studentdb`/`students` **hoặc** chứng minh CRUD trên schema app; volume bền |
-| Auth   | `authentication-identity-server/` | Keycloak admin/admin                             | Realm + client cho web/app; login/register trên UI; token gọi API bảo vệ                               |
-| MinIO  | `object-storage-server/`          | Console upload                                   | Bucket ảnh phòng / avatar; policy URL để web/API lấy được; (map đề) `profile-pics` + `documents`       |
-
-
-
-
-### Word
-
-Lợi tự vào file → viết + ảnh **Ch.3–4: DB + Auth + MinIO** (+ bullet Ch.5).
-
-**Điểm mở rộng: 1,5**
-
----
-
-
-
-## Bảo — Monitoring + logging + deploy
-
-
-
-### Kỹ thuật
-
-
-| Server                          | Folder                                 | Demo cơ bản                 | Mở rộng / E2E                                         |
-| ------------------------------- | -------------------------------------- | --------------------------- | ----------------------------------------------------- |
-| Prometheus                      | `monitoring-prometheus-server/`        | Target Node Exporter **UP** | Scrape thêm web/app nếu được; (tuỳ chọn) Alertmanager |
-| Node Exporter                   | (trong compose)                        | Metrics                     | —                                                     |
-| Grafana                         | `monitoring-grafana-dashboard-server/` | Datasource Prometheus       | Dashboard System Health of MSSV; datasource **Loki**  |
-| Loki + Promtail                 | (compose / folder log stack)           | Thu log container           | Panel log trên Grafana                                |
-| Redis (tuỳ chọn điểm cộng)      | (compose)                              | Cache cho NestJS            | —                                                     |
-| EC2 / Docker Hub / Ping / Video | —                                      | Deploy + minh chứng         | Máy EC2 đủ RAM cho stack nặng                         |
-
-
-
-
-### Word
-
-Bảo tự vào file → viết + ảnh **Ch.3–4: Prometheus + Grafana (+ Loki) + EC2**; tự điền Phụ lục (Hub, video, IP, log).
-
-**Compose:** Bảo merge `docker-compose.yml` chạy được trên EC2 (nhiều service hơn lab).
-
-**Điểm mở rộng: 1,0** (+ EC2, Hub, video, ping, log stack)
-
----
-
-
-| Chương  | Ai viết / trình bày nội dung                    |
-| ------- | ----------------------------------------------- |
-| Ch.1    | **Hân**                                         |
-| Ch.2    | Hân dựng khung/sơ đồ; cả nhóm bổ sung flow E2E  |
-| Ch.3    | **Mỗi người tự viết mục server của mình**       |
-| Ch.4    | **Mỗi người tự viết + chèn ảnh demo phần mình** |
-| Ch.5    | **Mỗi người tự viết** đoạn đánh giá phần mình   |
-| Phụ lục | **Mỗi người tự điền** link/log phần mình        |
+| Họ tên  | MSSV    | Server phụ trách                     | Điểm mở rộng | Nhiệm vụ thêm                                                 |
+| ------- | ------- | ------------------------------------ | ------------ | ------------------------------------------------------------- |
+| **Hân** | `[...]` | Web (React) + DNS                    | **1,0**      | **Khung & format Word**                                       |
+| **Vân** | `[...]` | Proxy + App (NestJS) + LB            | **1,5**      | Tự vào Word viết Ch.3–4 phần mình; **thống nhất API với Hân** |
+| **Lợi** | `[...]` | DB (Postgres) + Auth + MinIO         | **1,5**      | Tự vào Word viết Ch.3–4; **thống nhất Auth/data/ảnh với Hân** |
+| **Bảo** | `[...]` | Prometheus + Grafana + Loki/Promtail | **1,0**      | EC2 + video + Docker Hub + ping; merge compose                |
 
 
 ---
 
+## 6. Chi tiết từng người
+
+### Hân — Web (React) + DNS + khung/format Word
 
 
-## Deadline tổng (nộp trước **03/11/2026**)
+| Server | Folder                 | Demo cơ bản                     | Mở rộng / E2E                                                             |
+| ------ | ---------------------- | ------------------------------- | ------------------------------------------------------------------------- |
+| Web    | `web-frontend-server/` | React → Nginx `:8080`; **Home** | Đủ trang mục **§2**; flow list → login → chi tiết + ảnh; **Blog ≥ 3 bài** |
+| DNS    | `internal-dns-server/` | `dig` zone `cloud.local`        | Thêm A: `app-backend`, `minio`, `keycloak`                                |
 
-> Hôm nay: **22/10**. Còn **~12 ngày** → chốt nội bộ **02/11 tối** (đệm 1 ngày trước hạn 03/11).
+
+**Thống nhất:** nhận danh sách trang + API từ Vân/Lợi (mục **§3**); không tự đổi đề tài một mình.
+
+**Word:** khung + format; Ch.1 (ghi rõ đề tài phòng trọ + SV); Ch.2 sơ đồ; Ch.3–4 Web/DNS.
+
+---
+
+### Vân — Proxy + Application (NestJS) + LB
 
 
-| Mốc         | Ngày            | Mục tiêu cả nhóm                                                       |
-| ----------- | --------------- | ---------------------------------------------------------------------- |
-| **S1 xong** | **25/10 (CN)**  | Mỗi người demo riêng + ảnh; Vân App/Proxy đã xong → người khác bắt kịp |
-| **S2 xong** | **28/10 (T4)**  | `compose up` đủ 9 server + ping → **~5 điểm**                          |
-| **S3 xong** | **31/10 (T7)**  | E2E + mở rộng chính + EC2 + Hub + video quay xong                      |
-| **S4 xong** | **02/11 (CN)**  | Word đủ Ch.1–5 + Phụ lục, format xong, sẵn sàng nộp                    |
-| **Nộp**     | **Trước 03/11** | Theo LMS / GV                                                          |
+| Server | Folder                        | Demo cơ bản                  | Mở rộng / E2E                                     |
+| ------ | ----------------------------- | ---------------------------- | ------------------------------------------------- |
+| App    | `application-backend-server/` | `/hello`, port **8085→8081** | `/student` (JSON); sau API **rooms** đọc DB/MinIO |
+| Proxy  | `api-gateway-proxy-server/`   | `/`, `/api/`, `/auth/`       | Route thêm (vd `/student/`); strip `/api/`        |
+| LB     | compose + nginx upstream      | —                            | Round Robin **≥ 2** NestJS                        |
+
+
+**Thống nhất với Hân:** gửi/chốt bảng API (path → JSON mẫu) trước khi Hân code sâu FE.
+
+**Word:** Ch.3–4 Proxy/App/LB + Ch.5.
+
+---
+
+### Lợi — Database + Auth + MinIO
+
+
+| Server | Folder                            | Demo cơ bản                                        | Mở rộng / E2E                                 |
+| ------ | --------------------------------- | -------------------------------------------------- | --------------------------------------------- |
+| DB     | `relational-database-server/`     | Postgres + schema mẫu (**rooms**, users/students…) | CRUD / map `studentdb` đề; volume bền         |
+| Auth   | `authentication-identity-server/` | Keycloak admin/admin                               | Realm + client cho React; login UI; token API |
+| MinIO  | `object-storage-server/`          | Console upload                                     | Bucket ảnh phòng / avatar / documents         |
+
+
+**Thống nhất với Hân:** URL login, field form; cấu trúc phòng + cách lấy URL ảnh.
+
+**Word:** Ch.3–4 DB/Auth/MinIO + Ch.5.
+
+---
+
+### Bảo — Monitoring + logging + deploy
+
+
+| Server                     | Folder / việc                          | Demo cơ bản           | Mở rộng / E2E                     |
+| -------------------------- | -------------------------------------- | --------------------- | --------------------------------- |
+| Prometheus + Node Exporter | `monitoring-prometheus-server/`        | Targets **UP**        | Scrape web/app                    |
+| Grafana + Loki/Promtail    | `monitoring-grafana-dashboard-server/` | Datasource Prometheus | Dashboard System Health; log Loki |
+| Redis (tuỳ chọn)           | compose                                | Cache                 | —                                 |
+| EC2 / Hub / Ping / Video   | —                                      | Deploy                | Public IP + video E2E             |
+
+
+**Compose:** merge đủ 9 server (+ monitoring); ưu tiên gắn App/Proxy của Vân khi có trên Git.
+
+**Word:** Ch.3–4 monitoring/EC2; Phụ lục (Hub, video, IP, log).
+
+---
+
+## 7. Báo cáo Word
+
+
+| Chương  | Ai viết / trình bày                                     |
+| ------- | ------------------------------------------------------- |
+| Ch.1    | **Hân** (nêu đề tài + 9 server + mini app phòng trọ/SV) |
+| Ch.2    | Hân dựng sơ đồ; cả nhóm bổ sung flow E2E                |
+| Ch.3–4  | **Mỗi người** phần server của mình                      |
+| Ch.5    | **Mỗi người** đánh giá phần mình                        |
+| Phụ lục | **Mỗi người** điền link/log phần mình; Hân format       |
 
 
 ---
 
+## 8. Deadline tổng (nộp trước **03/11/2026**)
+
+> Chốt nội bộ **02/11 tối** (đệm trước hạn 03/11).
 
 
-## Deadline theo từng người
+| Mốc                               | Ngày            | Mục tiêu                             |
+| --------------------------------- | --------------- | ------------------------------------ |
+| **Thống nhất đề tài + trang Web** | **Trước 25/10** | Hân–Vân–Lợi chốt mục **§1–§2**       |
+| **S1 xong**                       | **25/10**       | Demo riêng từng người + ảnh          |
+| **S2 xong**                       | **28/10**       | Compose đủ 9 server + ping (~5 điểm) |
+| **S3 xong**                       | **31/10**       | E2E + mở rộng + EC2 + Hub + video    |
+| **S4 xong**                       | **02/11**       | Word đủ, sẵn sàng nộp                |
+| **Nộp**                           | **Trước 03/11** | Theo LMS / GV                        |
 
 
+### Deadline theo người
 
-### Hân
-
-
-| Deadline  | Việc                                                                       |
-| --------- | -------------------------------------------------------------------------- |
-| **24/10** | React Home build → Nginx chạy `:8080`; DNS `dig` OK + ảnh                  |
-| **27/10** | Web gắn compose; vào được qua proxy `/`                                    |
-| **30/10** | UI E2E (list → login → chi tiết/ảnh); DNS records mở rộng; map mở rộng Web |
-| **01/11** | Khung Word + Ch.1, Ch.2, Ch.3–4 Web/DNS (nháp)                             |
-| **02/11** | Format cuối toàn bài                                                       |
+**Hân**
 
 
+| Deadline     | Việc                                                                |
+| ------------ | ------------------------------------------------------------------- |
+| **24/10**    | Chốt trang với Vân/Lợi; React Home → Nginx `:8080`; DNS `dig` + ảnh |
+| **27/10**    | Web gắn compose; vào được qua proxy `/`                             |
+| **30/10**    | UI E2E đủ trang §2; DNS records mở rộng                             |
+| **01–02/11** | Word Ch.1–2, Ch.3–4 Web/DNS; format cuối                            |
 
 
-### Vân 
+**Vân**
 
 
-| Deadline | Việc |
-| -------- | ---- |
-| **24/10** | Push Git App+Proxy+screenshot; API `/student` + ảnh |
-| **27/10** | Test qua proxy `/api/hello`, `/api/student` khi có compose |
-| **30/10** | LB ≥ 2 NestJS Round Robin; route mở rộng; API gắn DB nếu Lợi sẵn |
-| **01/11** | Viết Ch.3–4 App/Proxy/LB + Ch.5 (nháp vào Word) |
-| **02/11** | Chỉnh sửa theo feedback Hân format |
+| Deadline     | Việc                                                    |
+| ------------ | ------------------------------------------------------- |
+| **24/10**    | Push Git App+Proxy+ảnh; bảng API gửi Hân; `/student` OK |
+| **27/10**    | Test `/api/hello`, `/api/student` qua proxy             |
+| **30/10**    | API rooms (nếu Lợi sẵn); LB ≥ 2 NestJS; route mở rộng   |
+| **01–02/11** | Word Ch.3–4 + Ch.5                                      |
 
 
+**Lợi**
 
 
-### Lợi
+| Deadline     | Việc                                                                           |
+| ------------ | ------------------------------------------------------------------------------ |
+| **24/10**    | Postgres schema mẫu (rooms/SV); Keycloak admin; MinIO + ảnh; gửi Hân note Auth |
+| **27/10**    | Gắn compose; `/auth/` OK                                                       |
+| **30/10**    | Realm/client gắn UI; bucket ảnh phòng; CRUD                                    |
+| **01–02/11** | Word Ch.3–4 + Ch.5                                                             |
 
 
-| Deadline  | Việc                                                        |
-| --------- | ----------------------------------------------------------- |
-| **24/10** | Postgres + schema mẫu; Keycloak admin; MinIO upload + ảnh   |
-| **27/10** | Gắn compose; `/auth/` OK; hỗ trợ token                      |
-| **30/10** | Realm/client gắn UI; MinIO buckets ảnh; CRUD/map mở rộng DB |
-| **01/11** | Ch.3–4 DB/Auth/MinIO + Ch.5 nháp                            |
-| **02/11** | Chỉnh sửa cuối                                              |
+**Bảo**
 
 
-
-
-### Bảo
-
-
-| Deadline     | Việc                                                                        |
-| ------------ | --------------------------------------------------------------------------- |
-| **24/10**    | Prometheus + Node Exporter + Grafana lên + ảnh                              |
-| **26/10**    | `docker-compose.yml` **xương** gắn đủ service (ưu tiên App/Proxy Vân đã có) |
-| **28/10**    | Compose full 9 server; log ping; điều phối test S2                          |
-| **30–31/10** | Loki; dashboard; **Docker Hub**; **EC2** public IP; **quay video**          |
-| **01/11**    | Ch.3–4 monitoring/EC2; điền Phụ lục (Hub, video, IP, log)                   |
-| **02/11**    | Check list nộp với cả nhóm                                                  |
+| Deadline     | Việc                                                           |
+| ------------ | -------------------------------------------------------------- |
+| **24/10**    | Prometheus + Node Exporter + Grafana + ảnh                     |
+| **26/10**    | Compose gắn thêm Web/App/Proxy/DB/Auth… (không chỉ monitoring) |
+| **28/10**    | Full 9 server; ping; điều phối S2                              |
+| **30–31/10** | Loki; Hub; **EC2**; **video**                                  |
+| **01–02/11** | Word + Phụ lục; checklist nộp                                  |
 
 
 ---
 
+## 9. Sprint & chỗ thống nhất nội dung
+
+### Sprint 1 — Build riêng — **25/10**
+
+**Làm song song** từng server.  
+**Thống nhất (bắt buộc, đầu S1):** đề tài + danh sách trang + API tạm (**§1–§3**).
 
 
-## Các sprint làm việc
+| Người   | Việc kỹ thuật                                             |
+| ------- | --------------------------------------------------------- |
+| **Hân** | React skeleton các trang §2 (có thể mock data); DNS       |
+| **Vân** | NestJS `/hello` + `/student`; Proxy; **gửi contract API** |
+| **Lợi** | Postgres + Keycloak + MinIO lên; **note Auth cho Hân**    |
+| **Bảo** | Prometheus + Node Exporter + Grafana                      |
 
 
-
-### Sprint 1 — Build riêng — **deadline 25/10**
-
-**Mục tiêu:** Mỗi người chạy được phần mình (chưa cần full cụm).
-
-
-| Người   | Việc                                                          |
-| ------- | ------------------------------------------------------------- |
-| **Hân** | React Hello/Home → Nginx; DNS + `dig`                         |
-| **Vân** | NestJS `/hello` + Dockerfile; Proxy nginx *(ưu tiên đã xong)* |
-| **Lợi** | Postgres + Keycloak admin + MinIO console                     |
-| **Bảo** | Prometheus + Node Exporter + Grafana `:3000`                  |
-
-
-**Done khi:** Mỗi người có ảnh/log demo phần mình.
+**Done khi:** Ảnh demo riêng + đã chốt nội dung Web.
 
 ---
 
+### Sprint 2 — Ghép cụm ~5 điểm — **28/10**
+
+**Thống nhất:** FE gọi đúng `/api/`, `/auth/` qua proxy; sửa lệch JSON/path.
 
 
-### Sprint 2 — Ghép cụm ~5 điểm — **deadline 28/10**
+| Người       | Việc                        |
+| ----------- | --------------------------- |
+| **Bảo**     | Merge compose + `cloud-net` |
+| **Hân**     | Web qua proxy `/`           |
+| **Vân**     | App + Proxy; `/api/...`     |
+| **Lợi**     | DB + Auth + MinIO           |
+| **Cả nhóm** | Ping mạng                   |
 
-**Mục tiêu:** `docker compose up` đủ 9 server + checklist đề.
-
-
-| Người       | Việc                                                        |
-| ----------- | ----------------------------------------------------------- |
-| **Bảo**     | Merge compose + `cloud-net` (**compose xương trước 26/10**) |
-| **Hân**     | Gắn Web + DNS; proxy `/`                                    |
-| **Vân**     | Gắn App + Proxy; `/api/...`, `/`, `/auth/`                  |
-| **Lợi**     | Gắn DB + Auth + MinIO                                       |
-| **Cả nhóm** | Ping `cloud-net` (Bảo ghi log)                              |
-
-
-**Done khi:** Demo 9 server + ping → **~5 điểm**.
 
 ---
 
+### Sprint 3 — E2E + mở rộng + deploy — **31/10**
+
+**Thống nhất sâu:** list/chi tiết phòng thật + login UI + ảnh MinIO.
 
 
-### Sprint 3 — E2E + mở rộng + deploy — **deadline 31/10**
+| Người   | Việc                      |
+| ------- | ------------------------- |
+| **Hân** | UI E2E đủ flow            |
+| **Vân** | API rooms + LB            |
+| **Lợi** | Schema/OIDC/MinIO gắn app |
+| **Bảo** | Loki + Hub + EC2 + video  |
 
-**Mục tiêu:** Flow E2E; mở rộng; EC2 + Hub + video.
-
-
-| Người   | Việc                                     |
-| ------- | ---------------------------------------- |
-| **Hân** | UI E2E; DNS mở rộng                      |
-| **Vân** | API + LB Round Robin; route `/student/`… |
-| **Lợi** | Schema/OIDC/MinIO thật                   |
-| **Bảo** | Loki + Hub + **EC2** + **video**         |
-
-
-**Done khi:** Ghi **X/10** mở rộng; video + EC2 IP chạy được.
 
 ---
 
+### Sprint 4 — Báo cáo — **02/11** (nộp trước 03/11)
 
 
-### Sprint 4 — Báo cáo — **deadline 02/11** (nộp trước 03/11)
+| Người   | Việc                                        |
+| ------- | ------------------------------------------- |
+| **Hân** | Khung Word + format; Ch.1–2; Ch.3–4 Web/DNS |
+| **Vân** | Ch.3–4 Proxy/App/LB + Ch.5                  |
+| **Lợi** | Ch.3–4 DB/Auth/MinIO + Ch.5                 |
+| **Bảo** | Ch.3–4 monitoring/EC2; Phụ lục              |
 
-
-| Người   | Việc                                                     |
-| ------- | -------------------------------------------------------- |
-| **Hân** | Khung Word + format; Ch.1–2; Ch.3–4 Web/DNS; format cuối |
-| **Vân** | Ch.3–4 Proxy/App/LB + Ch.5                               |
-| **Lợi** | Ch.3–4 DB/Auth/MinIO + Ch.5                              |
-| **Bảo** | Ch.3–4 monitoring/EC2; Phụ lục                           |
-
-
-**Done khi:** Word đủ + Git + Hub + video → nộp.
 
 ---
-
-
 
 ### Checklist nộp (chốt **02/11**)
 
 - [ ] 9 loại server chạy (local + EC2)
-- [ ] Mini app E2E demo được
+- [ ] Mini app E2E: list phòng → login → chi tiết/ảnh (hoặc flow tương đương đã chốt)
+- [ ] Blog ≥ 3 bài (mở rộng Web)
+- [ ] API `/student` (hoặc tương đương) có minh chứng
 - [ ] ≥ 1 image Docker Hub
 - [ ] Video + log ping
-- [ ] Word Ch.1–5 + Phụ lục; mỗi người tự viết phần mình
-- [ ] Format thống nhất (Hân)
-- [ ] Ghi rõ số phần mở rộng đã làm
+- [ ] Word Ch.1–5 + Phụ lục
+- [ ] Ghi rõ số phần mở rộng đề đã làm
 
 ---
 

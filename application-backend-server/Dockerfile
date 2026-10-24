@@ -15,5 +15,6 @@ COPY package*.json ./
 RUN npm install --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY students.json ./students.json
+COPY rooms.json ./rooms.json
 EXPOSE 8081
 CMD ["node", "dist/main.js"]

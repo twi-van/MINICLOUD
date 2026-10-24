@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "Phòng trọ gần ĐH",
+    "address": "Quận 7, TP.HCM",
+    "price": 3500000,
+    "area": 25,
+    "description": "Phòng mẫu gần trường đại học",
+    "imageUrl": null
+  },
+  {
+    "id": 2,
+    "title": "Phòng trọ trung tâm",
+    "address": "Thủ Đức, TP.HCM",
+    "price": 4200000,
+    "area": 30,
+    "description": "Phòng mẫu thứ hai",
+    "imageUrl": null
+  }
+]

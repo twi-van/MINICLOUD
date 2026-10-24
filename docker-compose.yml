@@ -72,3 +72,51 @@ services:
     restart: unless-stopped
     networks:
       - cloud-net
+
+  # --- Vân: App + Proxy (+ Web stub tạm cho S2) ---
+  application-backend-server:
+    build:
+      context: ./application-backend-server
+      dockerfile: Dockerfile
+    image: minicloud-app:dev
+    container_name: application-backend-server
+    ports:
+      - "8085:8081"
+    environment:
+      - PORT=8081
+      # Khi Lợi gắn DB vào compose, mở 2 dòng dưới để /rooms đọc Postgres:
+      # - POSTGRES_HOST=relational-database-server
+      # - POSTGRES_PORT=5432
+      # - POSTGRES_USER=minicloud
+      # - POSTGRES_PASSWORD=minicloud_dev
+      # - POSTGRES_DB=minicloud
+    restart: unless-stopped
+    networks:
+      - cloud-net
+
+  web-frontend-server:
+    build:
+      context: ./web-frontend-server
+      dockerfile: Dockerfile
+    image: minicloud-web:stub
+    container_name: web-frontend-server
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - cloud-net
+
+  api-gateway-proxy-server:
+    build:
+      context: ./api-gateway-proxy-server
+      dockerfile: Dockerfile
+    image: minicloud-proxy:dev
+    container_name: api-gateway-proxy-server
+    ports:
+      - "80:80"
+    depends_on:
+      - application-backend-server
+      - web-frontend-server
+    restart: unless-stopped
+    networks:
+      - cloud-net

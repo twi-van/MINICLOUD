@@ -77,6 +77,17 @@ cloud/
 
 Yêu cầu: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
+**Sprint 2 — App + Proxy (+ Web stub):** từ thư mục gốc repo:
+
+```bash
+docker compose up -d --build application-backend-server web-frontend-server api-gateway-proxy-server
+curl http://localhost/api/hello
+curl http://localhost/api/student
+curl http://localhost/api/rooms
+```
+
+Chạy cả stack (khi đã merge đủ service):
+
 ```bash
 docker compose up -d --build
 docker compose ps
@@ -91,14 +102,16 @@ docker compose down
 ## Kiểm thử nhanh
 
 ```bash
-# Qua proxy
+# Qua proxy (S2)
+curl http://localhost/api/hello
+curl http://localhost/api/student
+curl http://localhost/api/rooms
 curl -I http://localhost/
-curl -s  http://localhost/api/hello   # hoặc health/rooms tùy NestJS
 curl -I http://localhost/auth/
 
 # Web / App trực tiếp
 curl -I http://localhost:8080/
-curl -s  http://localhost:8085/hello  # hoặc endpoint tương đương
+curl -s http://localhost:8085/hello
 
 # DNS
 dig @127.0.0.1 -p 1053 web-frontend-server.cloud.local +short

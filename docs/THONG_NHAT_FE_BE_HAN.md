@@ -71,11 +71,11 @@ Qua proxy (sau S2): `http://localhost/api`
 
 
 
-## 4. API sẽ làm tiếp (S2–S3) — Hân mock trước được
+## 4. API rooms (đã có)
 
-Vân sẽ bổ sung (khi Lợi có Postgres). Hân **S1 có thể hard-code / mock** cùng shape:
+Ưu tiên đọc **Postgres** (khi set `POSTGRES_HOST` / `DATABASE_URL`); không có DB thì đọc `rooms.json`.
 
-### GET `/rooms` (dự kiến)
+### GET `/rooms`
 
 ```json
 [
@@ -85,14 +85,12 @@ Vân sẽ bổ sung (khi Lợi có Postgres). Hân **S1 có thể hard-code / mo
     "address": "Quận 7, TP.HCM",
     "price": 3500000,
     "area": 25,
-    "imageUrl": "https://..."
+    "imageUrl": null
   }
 ]
 ```
 
-
-
-### GET `/rooms/:id` (dự kiến)
+### GET `/rooms/:id`
 
 ```json
 {
@@ -101,12 +99,12 @@ Vân sẽ bổ sung (khi Lợi có Postgres). Hân **S1 có thể hard-code / mo
   "address": "Quận 7, TP.HCM",
   "price": 3500000,
   "area": 25,
-  "description": "...",
-  "imageUrl": "https://..."
+  "description": "Phòng mẫu gần trường đại học",
+  "imageUrl": null
 }
 ```
 
-Nếu Hân muốn đổi tên field (`name` thay `title`…) → **nhắn Vân trước 25/10** để hai bên cùng shape.
+404 nếu không có id. Field `imageUrl` sẽ có URL MinIO khi Lợi upload ảnh.
 
 ---
 

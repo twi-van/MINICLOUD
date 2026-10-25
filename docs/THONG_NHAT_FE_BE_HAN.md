@@ -73,38 +73,32 @@ Qua proxy (sau S2): `http://localhost/api`
 
 ## 4. API rooms (đã có)
 
-Ưu tiên đọc **Postgres** (khi set `POSTGRES_HOST` / `DATABASE_URL`); không có DB thì đọc `rooms.json`.
+Ưu tiên đọc **Postgres** (khi set `POSTGRES_HOST` / `DATABASE_URL`); không có DB thì đọc `rooms.json` (8 phòng, khớp mock FE Hân).
 
-### GET `/rooms`
+`imageUrl` là **string** (bắt buộc cho FE `isRoom`). Có thể thêm `district`, `type`, `amenities`, `images`, `available`.
 
-```json
-[
-  {
-    "id": 1,
-    "title": "Phòng trọ gần ĐH",
-    "address": "Quận 7, TP.HCM",
-    "price": 3500000,
-    "area": 25,
-    "imageUrl": null
-  }
-]
-```
+### GET `/rooms` / `GET /rooms/:id`
 
-### GET `/rooms/:id`
+Shape tối thiểu:
 
 ```json
 {
   "id": 1,
-  "title": "Phòng trọ gần ĐH",
-  "address": "Quận 7, TP.HCM",
+  "title": "Studio ngập nắng, một góc bình yên",
+  "address": "Đường Nguyễn Thị Thập, Quận 7, TP.HCM",
   "price": 3500000,
-  "area": 25,
-  "description": "Phòng mẫu gần trường đại học",
-  "imageUrl": null
+  "area": 28,
+  "imageUrl": "/images/room-1.jpg",
+  "description": "..."
 }
 ```
 
-404 nếu không có id. Field `imageUrl` sẽ có URL MinIO khi Lợi upload ảnh.
+404 nếu không có id. Sau này `imageUrl` có thể đổi sang URL MinIO (Lợi).
+
+### Load Balancer (S3)
+
+Proxy Round Robin 2 NestJS: `application-backend-server-1` / `-2`.  
+`GET /hello` trả thêm `"instance": "app-1"|"app-2"`.
 
 ---
 

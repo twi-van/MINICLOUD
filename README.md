@@ -77,13 +77,24 @@ cloud/
 
 Yêu cầu: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-**Sprint 2 — App + Proxy (+ Web stub):** từ thư mục gốc repo:
+**Sprint 2–3 — App × 2 (LB) + Proxy + Web:** từ thư mục gốc repo:
 
 ```bash
-docker compose up -d --build application-backend-server web-frontend-server api-gateway-proxy-server
+docker network create cloud-net   # nếu chưa có (compose dùng external network)
+
+docker compose up -d --build \
+  application-backend-server-1 \
+  application-backend-server-2 \
+  web-frontend-server \
+  api-gateway-proxy-server
+
 curl http://localhost/api/hello
 curl http://localhost/api/student
 curl http://localhost/api/rooms
+
+# LB: gọi vài lần — instance xen kẽ app-1 / app-2
+curl -s http://localhost/api/hello; echo
+curl -s http://localhost/api/hello; echo
 ```
 
 Chạy cả stack (khi đã merge đủ service):

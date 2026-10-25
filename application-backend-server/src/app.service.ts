@@ -3,17 +3,20 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { Pool } from 'pg';
 
-export type RoomListItem = {
+/** Khớp FE (Hân): imageUrl là string; field thêm là optional. */
+export type Room = {
   id: number;
   title: string;
   address: string;
   price: number;
   area: number;
-  imageUrl: string | null;
-};
-
-export type RoomDetail = RoomListItem & {
-  description: string;
+  imageUrl: string;
+  description?: string;
+  district?: string;
+  type?: string;
+  amenities?: string[];
+  images?: string[];
+  available?: boolean;
 };
 
 @Injectable()
@@ -21,7 +24,10 @@ export class AppService {
   private pool: Pool | null | undefined;
 
   getHello() {
-    return { message: 'Hello from App Server!' };
+    return {
+      message: 'Hello from App Server!',
+      instance: process.env.APP_INSTANCE || 'default',
+    };
   }
 
   getStudent() {
@@ -30,15 +36,15 @@ export class AppService {
     return JSON.parse(raw);
   }
 
-  async getRooms(): Promise<RoomListItem[]> {
+  async getRooms(): Promise<Room[]> {
     const fromDb = await this.tryRoomsFromDb();
     if (fromDb) {
-      return fromDb.map((r) => this.toListItem(r));
+      return fromDb;
     }
-    return this.readRoomsFile().map((r) => this.toListItem(r));
+    return this.readRoomsFile();
   }
 
-  async getRoomById(id: number): Promise<RoomDetail> {
+  async getRoomById(id: number): Promise<Room> {
     const pool = this.getPool();
     if (pool) {
       try {
@@ -51,12 +57,11 @@ export class AppService {
         if (result.rowCount === 0) {
           throw new NotFoundException(`Room ${id} not found`);
         }
-        return this.toDetail(this.mapDbRow(result.rows[0]));
+        return this.mapDbRow(result.rows[0]);
       } catch (err) {
         if (err instanceof NotFoundException) {
           throw err;
         }
-        // DB lỗi → fallback JSON
       }
     }
 
@@ -64,30 +69,37 @@ export class AppService {
     if (!room) {
       throw new NotFoundException(`Room ${id} not found`);
     }
-    return this.toDetail(room);
+    return room;
   }
 
-  private readRoomsFile(): RoomDetail[] {
+  private readRoomsFile(): Room[] {
     const filePath = join(process.cwd(), 'rooms.json');
     const raw = readFileSync(filePath, 'utf8');
-    return JSON.parse(raw) as RoomDetail[];
+    const list = JSON.parse(raw) as Room[];
+    return list.map((r) => this.normalizeRoom(r));
   }
 
-  private toListItem(room: RoomDetail): RoomListItem {
+  private normalizeRoom(room: Partial<Room> & Record<string, unknown>): Room {
     return {
       id: Number(room.id),
-      title: room.title,
-      address: room.address,
+      title: String(room.title ?? ''),
+      address: String(room.address ?? ''),
       price: Number(room.price),
       area: Number(room.area),
-      imageUrl: room.imageUrl ?? null,
-    };
-  }
-
-  private toDetail(room: RoomDetail): RoomDetail {
-    return {
-      ...this.toListItem(room),
-      description: room.description ?? '',
+      imageUrl:
+        typeof room.imageUrl === 'string' && room.imageUrl.length > 0
+          ? room.imageUrl
+          : '/images/room-placeholder.svg',
+      description:
+        typeof room.description === 'string' ? room.description : undefined,
+      district: typeof room.district === 'string' ? room.district : undefined,
+      type: typeof room.type === 'string' ? room.type : undefined,
+      amenities: Array.isArray(room.amenities)
+        ? (room.amenities as string[])
+        : undefined,
+      images: Array.isArray(room.images) ? (room.images as string[]) : undefined,
+      available:
+        typeof room.available === 'boolean' ? room.available : undefined,
     };
   }
 
@@ -128,19 +140,19 @@ export class AppService {
     area: string | number;
     description?: string;
     image_url?: string | null;
-  }): RoomDetail {
-    return {
+  }): Room {
+    return this.normalizeRoom({
       id: Number(row.id),
       title: row.title,
       address: row.address,
       price: Number(row.price),
       area: Number(row.area),
       description: row.description ?? '',
-      imageUrl: row.image_url ?? null,
-    };
+      imageUrl: row.image_url || '/images/room-placeholder.svg',
+    });
   }
 
-  private async tryRoomsFromDb(): Promise<RoomDetail[] | null> {
+  private async tryRoomsFromDb(): Promise<Room[] | null> {
     const pool = this.getPool();
     if (!pool) {
       return null;

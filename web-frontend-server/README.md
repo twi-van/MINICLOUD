@@ -1,6 +1,6 @@
 # MiniHome · MyMiniCloud frontend
 
-Giao diện tìm phòng trọ dành cho sinh viên, xây dựng từ yêu cầu trong `docs/THONG_NHAT_FE_BE_HAN.md`, `PHAN_CONG_NHOM.md`, README gốc và đề bài `Báo Cáo Cuối Kỳ.docx`.
+Giao diện tìm phòng trọ dành cho sinh viên, xây dựng từ yêu cầu trong `docs/THONG_NHAT_FE_BE_HAN.md`, `PHAN_CONG_NHOM.md`, README gốc và đề bài `De_Bai_Cuoi_Ky.docx`.
 
 React + TypeScript + Vite, **Tailwind CSS 4**, **Ant Design 6**, Ant Design Icons và **Motion for React**. Font tiếng Việt Be Vietnam Pro và ảnh minh họa được phục vụ từ dự án, không cần CDN khi chạy. Thương hiệu giao diện là MiniHome, thuộc MyMiniCloud.
 

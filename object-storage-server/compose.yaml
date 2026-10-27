@@ -15,3 +15,10 @@ services:
       - "9001:9001"
     volumes:
       - ./data:/data
+    networks:
+      - cloud-net
+
+networks:
+  cloud-net:
+    name: cloud-net
+    external: true

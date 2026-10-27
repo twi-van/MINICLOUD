@@ -7,11 +7,21 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
-    # Host 8081 serves Keycloak; NestJS maps host 8085 to container 8081.
+      KC_HOSTNAME: ${KEYCLOAK_PUBLIC_URL:-http://localhost/auth}
+      KC_HOSTNAME_ADMIN: ${KEYCLOAK_ADMIN_URL:-http://localhost:8082}
+      KC_PROXY_HEADERS: xforwarded
+    # Host 8082 serves Keycloak; NestJS maps host 8085 to container 8081.
     ports:
-      - "8081:8080"
+      - "8082:8080"
     volumes:
       - keycloak_data:/opt/keycloak/data
+    networks:
+      - cloud-net
 
 volumes:
   keycloak_data:
+
+networks:
+  cloud-net:
+    name: cloud-net
+    external: true

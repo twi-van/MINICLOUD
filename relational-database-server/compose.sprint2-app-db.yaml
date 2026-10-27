@@ -1,0 +1,18 @@
+# Sprint 2 integration overlay: make both NestJS instances read L's Postgres.
+# Apply together with the root Compose file; keeps Vân/Bảo's base files untouched.
+services:
+  application-backend-server-1:
+    environment:
+      POSTGRES_HOST: relational-database-server
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: minicloud
+      POSTGRES_PASSWORD: minicloud_dev
+      POSTGRES_DB: minicloud
+
+  application-backend-server-2:
+    environment:
+      POSTGRES_HOST: relational-database-server
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: minicloud
+      POSTGRES_PASSWORD: minicloud_dev
+      POSTGRES_DB: minicloud

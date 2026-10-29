@@ -2,10 +2,9 @@ import { mockResponse } from '../../../shared/lib/http'
 import { config } from '../../../shared/lib/config'
 import type { DemoUser, LoginInput, RegisterInput } from '../types'
 
-// Demo identity only: no passwords, access tokens or pretend accounts are stored.
-// Replace this adapter with Keycloak redirect/PKCE when realm/client are agreed.
+// Optional offline demo only. Real login is handled by the Keycloak adapter.
 function assertMock() {
-  if (config.dataSource !== 'mock')
+  if (config.authMode !== 'mock')
     throw new Error('Dịch vụ đăng nhập hiện chưa khả dụng. Vui lòng thử lại sau.')
 }
 export const authService = {

@@ -14,15 +14,15 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'pnpm dev --host 127.0.0.1 --port 4173 --strictPort',
+      command: 'node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4173 --strictPort',
       url: 'http://127.0.0.1:4173',
-      env: { VITE_DATA_SOURCE: 'mock' },
+      env: { VITE_DATA_SOURCE: 'mock', VITE_AUTH_MODE: 'mock' },
       reuseExistingServer: false,
     },
     {
-      command: 'pnpm dev --host 127.0.0.1 --port 4174 --strictPort',
+      command: 'node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4174 --strictPort',
       url: 'http://127.0.0.1:4174',
-      env: { VITE_DATA_SOURCE: 'api' },
+      env: { VITE_DATA_SOURCE: 'api', VITE_AUTH_MODE: 'mock' },
       reuseExistingServer: false,
     },
   ],

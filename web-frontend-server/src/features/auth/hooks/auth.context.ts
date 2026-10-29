@@ -1,8 +1,9 @@
 import { createContext, useContext } from 'react'
-import type { DemoUser } from '../types'
+import type { AuthUser, DemoUser } from '../types'
 export const AuthContext = createContext<{
-  user: DemoUser | null
+  user: AuthUser | null
+  error?: string
   signIn: (user: DemoUser) => void
-  signOut: () => void
-}>({ user: null, signIn: () => {}, signOut: () => {} })
+  signOut: () => Promise<void>
+}>({ user: null, signIn: () => {}, signOut: async () => {} })
 export const useAuth = () => useContext(AuthContext)

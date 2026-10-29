@@ -59,7 +59,7 @@
   content: '';
   left: 0;
   right: 0;
-  bottom: -18px;
+  bottom: -8px;
   height: 2px;
   background: #b66b43;
 }
@@ -1632,6 +1632,13 @@ kbd {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 20px;
+}
+.blog-editorial-grid:not(:has(> :nth-child(2))) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.blog-editorial-grid:not(:has(> :nth-child(2))) > .blog-card {
+  width: min(100%, 560px);
+  justify-self: center;
 }
 .blog-editorial-grid .blog-card {
   background: #fffffff5;

@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from 'react'
-import { Avatar, Button, Drawer, Dropdown, Spin } from 'antd'
+import { Alert, App as AntApp, Avatar, Button, Drawer, Spin } from 'antd'
 import {
   ArrowRightOutlined,
   CloudOutlined,
@@ -16,6 +16,7 @@ import { useFavorites } from '../../features/rooms/hooks/favorites.context'
 import { QuickSearch } from '../../features/rooms/components/QuickSearch'
 import { VisualEffects } from '../../shared/components/VisualEffects'
 import { ScrollProgress } from '../../shared/components/ScrollProgress'
+import { config } from '../../shared/lib/config'
 
 const nav = [
   { to: '/', label: 'Trang chủ' },
@@ -29,7 +30,11 @@ export function AppLayout() {
   const [searchOpen, setSearchOpen] = useState(false)
   const location = useLocation()
   const outlet = useOutlet()
-  const { user, signOut } = useAuth()
+  const { user, signOut, error: authError } = useAuth()
+  const { message } = AntApp.useApp()
+  const logout = () => {
+    void signOut().catch(() => message.error('Không thể đăng xuất. Vui lòng thử lại.'))
+  }
   const { ids } = useFavorites()
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
@@ -106,35 +111,34 @@ export function AppLayout() {
             </Link>
             <div className="mx-1 hidden h-6 w-px bg-line sm:block" />
             {user ? (
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: 'saved',
-                      label: <Link to="/rooms?saved=true">Phòng đã lưu</Link>,
-                      icon: <HeartOutlined />,
-                    },
-                    {
-                      key: 'logout',
-                      label: 'Đăng xuất',
-                      icon: <LogoutOutlined />,
-                      onClick: signOut,
-                    },
-                  ],
-                }}
-                trigger={['click']}
-              >
-                <Button type="text" className="!h-auto !px-1">
+              <>
+                <div
+                  className="flex items-center gap-2"
+                  role="status"
+                  aria-label={`Tài khoản ${user.name}`}
+                >
                   <Avatar size="small" icon={<UserOutlined />} />
                   <span className="hidden max-w-25 truncate sm:inline">{user.name}</span>
-                </Button>
-              </Dropdown>
+                </div>
+                <span className="hidden sm:inline-flex">
+                  <Button
+                    type="text"
+                    icon={<LogoutOutlined />}
+                    aria-label="Đăng xuất"
+                    title="Đăng xuất"
+                    onClick={logout}
+                  />
+                </span>
+              </>
             ) : (
               <>
                 <Link to="/login" className="hidden text-sm font-medium text-navy sm:block">
                   Đăng nhập
                 </Link>
-                <Link to="/register" className="hidden sm:block">
+                <Link
+                  to={config.authMode === 'keycloak' ? '/login' : '/register'}
+                  className="hidden sm:block"
+                >
                   <Button type="primary" className="header-join">
                     Bắt đầu ngay <ArrowRightOutlined />
                   </Button>
@@ -154,18 +158,47 @@ export function AppLayout() {
       <Drawer title="Khám phá MiniHome" open={menuOpen} onClose={() => setMenuOpen(false)}>
         <nav className="flex flex-col gap-5" aria-label="Điều hướng di động">
           {links}
+          {user && (
+            <Button
+              icon={<LogoutOutlined />}
+              onClick={() => {
+                setMenuOpen(false)
+                logout()
+              }}
+            >
+              Đăng xuất
+            </Button>
+          )}
           {!user && (
             <>
               <Link to="/login" onClick={() => setMenuOpen(false)}>
                 Đăng nhập
               </Link>
-              <Link to="/register" onClick={() => setMenuOpen(false)}>
-                Đăng ký
-              </Link>
+              {config.authMode === 'mock' && (
+                <Link to="/register" onClick={() => setMenuOpen(false)}>
+                  Đăng ký
+                </Link>
+              )}
             </>
           )}
         </nav>
       </Drawer>
+      {authError && location.pathname !== '/login' && location.pathname !== '/register' && (
+        <div className="page-container pt-4">
+          <Alert
+            type="warning"
+            showIcon
+            title={authError}
+            action={
+              <Link
+                to={`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`}
+              >
+                Đăng nhập lại
+              </Link>
+            }
+          />
+        </div>
+      )}
       <main id="main-content" tabIndex={-1}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div

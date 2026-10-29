@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { App, Button, Form, Input } from 'antd'
+import { useEffect, useState } from 'react'
+import { Alert, App, Button, Form, Input } from 'antd'
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -12,18 +12,31 @@ import { useAuth } from '../hooks/auth.context'
 import { authService } from '../services/auth.service'
 import type { RegisterInput } from '../types'
 import { SafeImage } from '../../../shared/components/SafeImage'
+import { config } from '../../../shared/lib/config'
+import { loginWithKeycloak, safeRedirect } from '../services/keycloak'
 
 export default function AuthPage({ register = false }: { register?: boolean }) {
   const [loading, setLoading] = useState(false)
-  const { signIn } = useAuth()
+  const { signIn, user, error } = useAuth()
   const { message } = App.useApp()
   const navigate = useNavigate()
   const [params] = useSearchParams()
-  const requested = params.get('redirect') || '/rooms'
-  const redirect =
-    requested.startsWith('/') && !requested.startsWith('//') && !requested.includes('\\')
-      ? requested
-      : '/rooms'
+  const redirect = safeRedirect(params.get('redirect') || '/rooms')
+  const keycloakMode = config.authMode === 'keycloak'
+  useEffect(() => {
+    if (keycloakMode && user) navigate(redirect, { replace: true })
+  }, [keycloakMode, user, navigate, redirect])
+
+  const login = async () => {
+    setLoading(true)
+    try {
+      await loginWithKeycloak(redirect)
+    } catch {
+      message.error('Không thể mở trang đăng nhập. Vui lòng thử lại.')
+    } finally {
+      setLoading(false)
+    }
+  }
   const submit = async (values: RegisterInput) => {
     setLoading(true)
     try {
@@ -75,97 +88,126 @@ export default function AuthPage({ register = false }: { register?: boolean }) {
               ? 'Một bước nhỏ để tìm chốn về mới.'
               : 'Đăng nhập để tiếp tục hành trình tìm phòng.'}
           </p>
-          <Form
-            layout="vertical"
-            requiredMark={false}
-            onFinish={submit}
-            size="large"
-            key={register ? 'register' : 'login'}
-          >
-            {register && (
+          {keycloakMode ? (
+            <div className="space-y-5">
+              {error && <Alert type="warning" showIcon title={error} />}
+              <p className="text-sm leading-6 text-muted">
+                {register
+                  ? 'Tài khoản được cấp bởi quản trị viên. Nếu đã có tài khoản, bạn có thể đăng nhập bên dưới.'
+                  : 'Bạn sẽ được chuyển đến trang Keycloak để đăng nhập và quay lại trang đang xem.'}
+              </p>
+              <Button
+                block
+                type="primary"
+                size="large"
+                loading={loading}
+                onClick={login}
+                icon={<ArrowRightOutlined />}
+                iconPlacement="end"
+              >
+                Đăng nhập qua Keycloak
+              </Button>
+              <Link className="text-link" to="/rooms">
+                Tiếp tục xem phòng
+              </Link>
+            </div>
+          ) : (
+            <Form
+              layout="vertical"
+              requiredMark={false}
+              onFinish={submit}
+              size="large"
+              key={register ? 'register' : 'login'}
+            >
+              {register && (
+                <Form.Item
+                  label="Họ và tên"
+                  name="name"
+                  rules={[
+                    { required: true, whitespace: true, message: 'Vui lòng nhập họ và tên.' },
+                    { max: 80, message: 'Họ và tên không được vượt quá 80 ký tự.' },
+                  ]}
+                >
+                  <Input
+                    autoComplete="name"
+                    prefix={<UserOutlined className="text-muted" />}
+                    placeholder="Nhập họ và tên đầy đủ"
+                  />
+                </Form.Item>
+              )}
               <Form.Item
-                label="Họ và tên"
-                name="name"
+                label="Email"
+                name="email"
                 rules={[
-                  { required: true, whitespace: true, message: 'Vui lòng nhập họ và tên.' },
-                  { max: 80, message: 'Họ và tên không được vượt quá 80 ký tự.' },
+                  { required: true, message: 'Vui lòng nhập địa chỉ email.' },
+                  { type: 'email', message: 'Nhập email hợp lệ, ví dụ: ten@gmail.com.' },
                 ]}
               >
                 <Input
-                  autoComplete="name"
-                  prefix={<UserOutlined className="text-muted" />}
-                  placeholder="Nhập họ và tên đầy đủ"
+                  type="email"
+                  autoComplete="email"
+                  prefix={<MailOutlined className="text-muted" />}
+                  placeholder="Nhập địa chỉ email của bạn"
                 />
               </Form.Item>
-            )}
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                { required: true, message: 'Vui lòng nhập địa chỉ email.' },
-                { type: 'email', message: 'Nhập email hợp lệ, ví dụ: ten@gmail.com.' },
-              ]}
-            >
-              <Input
-                type="email"
-                autoComplete="email"
-                prefix={<MailOutlined className="text-muted" />}
-                placeholder="Nhập địa chỉ email của bạn"
-              />
-            </Form.Item>
-            <Form.Item
-              label="Mật khẩu"
-              name="password"
-              rules={[
-                { required: true, message: 'Vui lòng nhập mật khẩu.' },
-                { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự.' },
-              ]}
-            >
-              <Input.Password
-                autoComplete="off"
-                prefix={<LockOutlined className="text-muted" />}
-                placeholder={register ? 'Tạo mật khẩu từ 6 ký tự' : 'Nhập mật khẩu của bạn'}
-              />
-            </Form.Item>
-            {register && (
               <Form.Item
-                label="Xác nhận mật khẩu"
-                name="confirm"
-                dependencies={['password']}
+                label="Mật khẩu"
+                name="password"
                 rules={[
-                  { required: true, message: 'Vui lòng xác nhận mật khẩu.' },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      return !value || getFieldValue('password') === value
-                        ? Promise.resolve()
-                        : Promise.reject(new Error('Mật khẩu chưa khớp. Nhập lại mật khẩu ở trên.'))
-                    },
-                  }),
+                  { required: true, message: 'Vui lòng nhập mật khẩu.' },
+                  { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự.' },
                 ]}
               >
-                <Input.Password autoComplete="off" placeholder="Nhập lại mật khẩu vừa tạo" />
+                <Input.Password
+                  autoComplete="off"
+                  prefix={<LockOutlined className="text-muted" />}
+                  placeholder={register ? 'Tạo mật khẩu từ 6 ký tự' : 'Nhập mật khẩu của bạn'}
+                />
               </Form.Item>
-            )}
-            <Button
-              block
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              icon={<ArrowRightOutlined />}
-              iconPlacement="end"
-            >
-              {register ? 'Đăng ký' : 'Đăng nhập'}
-            </Button>
-          </Form>
-          <p className="mt-6 text-center text-sm text-muted">
-            {register ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}
-            <Link
-              className="font-semibold text-brand"
-              to={`${register ? '/login' : '/register'}?redirect=${encodeURIComponent(redirect)}`}
-            >
-              {register ? 'Đăng nhập' : 'Đăng ký ngay'}
-            </Link>
-          </p>
+              {register && (
+                <Form.Item
+                  label="Xác nhận mật khẩu"
+                  name="confirm"
+                  dependencies={['password']}
+                  rules={[
+                    { required: true, message: 'Vui lòng xác nhận mật khẩu.' },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        return !value || getFieldValue('password') === value
+                          ? Promise.resolve()
+                          : Promise.reject(
+                              new Error('Mật khẩu chưa khớp. Nhập lại mật khẩu ở trên.'),
+                            )
+                      },
+                    }),
+                  ]}
+                >
+                  <Input.Password autoComplete="off" placeholder="Nhập lại mật khẩu vừa tạo" />
+                </Form.Item>
+              )}
+              <Button
+                block
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                icon={<ArrowRightOutlined />}
+                iconPlacement="end"
+              >
+                {register ? 'Đăng ký' : 'Đăng nhập'}
+              </Button>
+            </Form>
+          )}
+          {!keycloakMode && (
+            <p className="mt-6 text-center text-sm text-muted">
+              {register ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}
+              <Link
+                className="font-semibold text-brand"
+                to={`${register ? '/login' : '/register'}?redirect=${encodeURIComponent(redirect)}`}
+              >
+                {register ? 'Đăng nhập' : 'Đăng ký ngay'}
+              </Link>
+            </p>
+          )}
         </div>
       </div>
     </div>

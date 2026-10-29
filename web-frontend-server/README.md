@@ -14,7 +14,7 @@ pnpm install
 pnpm dev
 ```
 
-Mở URL Vite in ra, mặc định `http://localhost:5173`. **Không cần backend, database, Keycloak hay MinIO để dùng mock.** Có thể sao chép `.env.example` thành `.env.local`; nếu không tạo file, ứng dụng vẫn mặc định mock.
+Mở URL Vite in ra, mặc định `http://localhost:5173`. Chép `.env.example` thành `.env.local` để dùng API và Keycloak thật từ gateway đang chạy. Nếu không tạo file, Vite vẫn mặc định mock. Có thể đặt `VITE_DATA_SOURCE=mock`, `VITE_AUTH_MODE=mock` để dùng hoàn toàn offline.
 
 ```bash
 pnpm build
@@ -35,7 +35,7 @@ Kiểm thử E2E dùng Google Chrome đã cài. Có thể chọn Edge qua biến
 | `/rooms/:id`          | Chi tiết, ảnh phóng to, lưu/chia sẻ, hẹn xem phòng demo                      |
 | `/blog/`              | 3 bài đầy đủ, lọc chủ đề và tìm kiếm                                         |
 | `/blog/:slug`         | Nội dung bài viết và bài liên quan                                           |
-| `/login`, `/register` | Form có validation, phiên trải nghiệm trong bộ nhớ                           |
+| `/login`, `/register` | Đăng nhập Keycloak/PKCE; hướng dẫn cấp tài khoản, mock tùy chọn             |
 | `/students`           | 5 sinh viên đúng JSON mẫu, tìm tên, lọc ngành, sắp xếp GPA                   |
 
 Có menu di động, bộ lọc responsive, trạng thái loading/error/empty, thử lại, ảnh dự phòng và trang 404. Các bộ lọc phòng nằm trên URL, dùng được khi tải lại/chia sẻ liên kết.
@@ -53,7 +53,7 @@ Phong cách MiniHome Club: nền kem, tím điện, xanh lime, chữ lớn và c
 
 `MotionConfig reducedMotion="user"`, hook `useReducedMotion` và CSS `prefers-reduced-motion` giảm hoặc tắt chuyển động theo cài đặt hệ điều hành. Hiệu ứng nghiêng chỉ xử lý con trỏ chuột. Các hiệu ứng dùng transform/opacity; cập nhật pointer/scroll dùng MotionValue, tránh render lại trang ở mỗi frame.
 
-15 kiểm thử E2E kiểm tra cả các luồng cũ và tương tác mới, bao gồm viewport 320px/390px, chế độ giảm chuyển động và adapter nhận JSON tối thiểu của BE.
+Bộ kiểm thử giao diện kiểm tra các tương tác, responsive và adapter API bằng response giả. `pnpm test:auth` chạy riêng luồng đăng nhập/logout với Keycloak thật theo hướng dẫn cấu hình bên dưới.
 
 ## Cấu trúc feature based
 
@@ -66,7 +66,7 @@ src/
 │   ├── home/            # pages và components/RoomMatchQuiz
 │   ├── rooms/           # types, data, services, hooks, lib, components, pages
 │   ├── blog/            # types, data nội dung, components, pages
-│   ├── auth/            # types, adapter mock, context, provider, pages
+│   ├── auth/            # Keycloak/PKCE, adapter mock tùy chọn, context, pages
 │   └── students/        # types, data, service, pages
 ├── shared/
 │   ├── components/      # Reveal, ScrollProgress, ảnh dự phòng, loading/error
@@ -77,7 +77,7 @@ src/
 └── App.css              # Bố cục riêng của thương hiệu
 ```
 
-Luồng dữ liệu: **page → service → mock hoặc HTTP → DTO**. Components không import trực tiếp dữ liệu phòng/sinh viên mẫu. Blog là nội dung biên tập tĩnh theo yêu cầu đề bài, chưa có contract CMS. Auth và lịch hẹn là trải nghiệm giao diện; không coi là xác thực hay đặt lịch thật.
+Luồng dữ liệu: **page → service → mock hoặc HTTP → DTO**. Components không import trực tiếp dữ liệu phòng/sinh viên mẫu. Blog là nội dung biên tập tĩnh theo yêu cầu đề bài, chưa có contract CMS. Auth dùng Keycloak khi cấu hình chế độ thật; lịch hẹn vẫn là trải nghiệm giao diện, chưa có API đặt lịch.
 
 ## Chuyển sang backend thật
 
@@ -102,7 +102,11 @@ Hiện lọc/sắp xếp/phân trang ở frontend vì contract chỉ có mảng.
 
 ### Auth và lịch hẹn
 
-`auth.service.ts` là điểm thay thế bằng Keycloak redirect/PKCE sau khi Lợi cung cấp realm, client và URL `/auth/`. Hiện không gọi Keycloak, không phát token, không lưu mật khẩu hay tạo user thật. Phiên demo chỉ nằm trong React state, mất khi tải lại trang. Trong chế độ API, form thông báo chưa tích hợp; thao tác hẹn xem phòng bị tắt vì chưa có contract đặt lịch.
+Chế độ API mặc định dùng Keycloak tại `http://localhost/auth`, realm `minicloud`, client public `web-frontend`. Nút **Đăng nhập qua Keycloak** chuyển đến Keycloak; callback được xử lý trước React Router và đưa người dùng về trang đã chọn. Adapter dùng Authorization Code + PKCE S256, khôi phục phiên sau reload, refresh token trước request API và đăng xuất khỏi SSO. Token chỉ nằm trong bộ nhớ; sessionStorage chỉ lưu cờ boolean phục vụ kiểm tra SSO khi tải lại.
+
+Realm hiện tắt tự đăng ký, nên trang `/register` hướng dẫn dùng tài khoản được quản trị viên cấp. Không nhập mật khẩu Keycloak trên React. `VITE_AUTH_MODE=mock` giữ adapter offline để kiểm thử giao diện. `VITE_AUTH_MODE=keycloak` có thể dùng độc lập với nguồn dữ liệu phòng. Cấu hình và kiểm thử thật: [AUTH_KEYCLOAK.md](AUTH_KEYCLOAK.md).
+
+Các request API sau đăng nhập có header Bearer; backend hiện vẫn có API công khai, chưa có guard xác minh token. Thao tác hẹn xem phòng vẫn bị tắt trong chế độ API vì chưa có contract đặt lịch.
 
 Luồng demo: chi tiết → hẹn xem → login → quay lại chi tiết → điền lịch → xác nhận mô phỏng. Không có request gửi chủ nhà, không lưu số điện thoại hay lịch hẹn.
 
@@ -115,7 +119,7 @@ docker compose up -d --build
 
 Truy cập `http://localhost:8080`, `/blog/`, `/rooms/1` đều được Nginx fallback về React khi refresh. Compose riêng chỉ chạy frontend, gắn `cloud-net`; không thay compose gốc của Bảo. Image build nhiều stage: Node build → Nginx phục vụ `dist`.
 
-`VITE_*` được nhúng lúc **build**. Sau khi đổi nguồn dữ liệu cần `docker compose up -d --build`. `BACKEND_UPSTREAM` là biến **runtime** dùng bởi Nginx, mặc định `host.docker.internal:8085` cho backend trên máy host. Khi ghép full stack trên `cloud-net`, đặt `BACKEND_UPSTREAM=application-backend-server:8081`. Gateway hiện tại có thể tiếp tục route `/` đến frontend và `/api/` đến NestJS.
+`VITE_*` được nhúng lúc **build**. Sau khi đổi nguồn dữ liệu hoặc thông số Keycloak cần build lại. Dockerfile frontend mặc định dùng API và Keycloak thật, cùng upstream `application-backend-server-1:8081` trên mạng stack hiện có; không chỉnh Compose gốc. Compose riêng trong thư mục frontend vẫn mặc định mock và dùng `host.docker.internal:8085` cho backend trên host. Gateway do Vân phụ trách chia tải API ở cổng 80.
 
 ## Tài nguyên
 

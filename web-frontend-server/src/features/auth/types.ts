@@ -1,6 +1,10 @@
-export interface DemoUser {
+export interface AuthUser {
+  id?: string
   name: string
   email: string
+  mode: 'demo' | 'keycloak'
+}
+export interface DemoUser extends AuthUser {
   mode: 'demo'
 }
 export interface LoginInput {

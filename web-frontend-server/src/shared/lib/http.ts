@@ -1,4 +1,5 @@
 import { config } from './config'
+import { getAccessToken } from '../../features/auth/services/keycloak'
 
 export class ApiError extends Error {
   status: number
@@ -9,12 +10,16 @@ export class ApiError extends Error {
   }
 }
 
-// All backend traffic goes through this boundary. Add bearer-token handling here
-// when the team's Keycloak realm/client contract is available.
+// Refresh the in-memory access token before sending authenticated API requests.
 export async function getJson(path: string, signal?: AbortSignal): Promise<unknown> {
+  const token = await getAccessToken()
+  signal?.throwIfAborted()
   const response = await fetch(`${config.apiBaseUrl}${path}`, {
     signal,
-    headers: { Accept: 'application/json' },
+    headers: {
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
   })
   if (!response.ok) {
     throw new ApiError('Không thể tải dữ liệu. Vui lòng thử lại.', response.status)

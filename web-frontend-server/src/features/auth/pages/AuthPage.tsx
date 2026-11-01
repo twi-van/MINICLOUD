@@ -30,7 +30,14 @@ export default function AuthPage({ register = false }: { register?: boolean }) {
   const login = async () => {
     setLoading(true)
     try {
-      await loginWithKeycloak(redirect)
+      if (keycloakMode) {
+        await loginWithKeycloak(redirect)
+      } else {
+        // In mock mode, redirect directly to the Keycloak account page
+        const kcUrl = config.keycloak.url.replace(/\/$/, '')
+        const realm = config.keycloak.realm
+        window.location.href = `${kcUrl}/realms/${realm}/account`
+      }
     } catch {
       message.error('Không thể mở trang đăng nhập. Vui lòng thử lại.')
     } finally {
@@ -198,15 +205,33 @@ export default function AuthPage({ register = false }: { register?: boolean }) {
             </Form>
           )}
           {!keycloakMode && (
-            <p className="mt-6 text-center text-sm text-muted">
-              {register ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}
-              <Link
-                className="font-semibold text-brand"
-                to={`${register ? '/login' : '/register'}?redirect=${encodeURIComponent(redirect)}`}
+            <>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-xs text-muted">hoặc</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+              <Button
+                block
+                size="large"
+                loading={loading}
+                onClick={login}
+                className="mt-4"
+                icon={<ArrowRightOutlined />}
+                iconPlacement="end"
               >
-                {register ? 'Đăng nhập' : 'Đăng ký ngay'}
-              </Link>
-            </p>
+                Đăng nhập qua Keycloak SSO
+              </Button>
+              <p className="mt-6 text-center text-sm text-muted">
+                {register ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}
+                <Link
+                  className="font-semibold text-brand"
+                  to={`${register ? '/login' : '/register'}?redirect=${encodeURIComponent(redirect)}`}
+                >
+                  {register ? 'Đăng nhập' : 'Đăng ký ngay'}
+                </Link>
+              </p>
+            </>
           )}
         </div>
       </div>

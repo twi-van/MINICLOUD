@@ -25,10 +25,11 @@ CREATE TABLE IF NOT EXISTS students (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- image_url trỏ MinIO bucket rooms-images (chạy object-storage-server/seed-rooms.sh sau khi MinIO lên).
 INSERT INTO rooms (title, address, price, area, description, image_url)
 VALUES
-    ('Phòng trọ gần ĐH', 'Quận 7, TP.HCM', 3500000, 25, 'Phòng mẫu gần trường đại học', NULL),
-    ('Phòng trọ trung tâm', 'Thủ Đức, TP.HCM', 4200000, 30, 'Phòng mẫu thứ hai', NULL);
+    ('Phòng trọ gần ĐH', 'Quận 7, TP.HCM', 3500000, 25, 'Phòng mẫu gần trường đại học', 'http://localhost:9000/rooms-images/room-1.jpg'),
+    ('Phòng trọ trung tâm', 'Thủ Đức, TP.HCM', 4200000, 30, 'Phòng mẫu thứ hai', 'http://localhost:9000/rooms-images/room-2.jpg');
 
 INSERT INTO users (email, full_name)
 VALUES ('demo@minicloud.local', 'Demo User')

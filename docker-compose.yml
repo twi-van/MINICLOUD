@@ -125,6 +125,13 @@ services:
     build:
       context: ./web-frontend-server
       dockerfile: Dockerfile
+      args:
+        VITE_DATA_SOURCE: api
+        VITE_API_BASE_URL: /api
+        VITE_AUTH_MODE: keycloak
+        VITE_KEYCLOAK_URL: http://localhost/auth
+        VITE_KEYCLOAK_REALM: minicloud
+        VITE_KEYCLOAK_CLIENT_ID: web-frontend
     image: myminicloud-web:v1
     container_name: web-frontend-server
     ports:

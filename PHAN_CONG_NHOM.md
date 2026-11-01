@@ -22,6 +22,8 @@
 
 ---
 
+
+
 ## 2. Nội dung Web (Hân làm FE) — danh sách trang
 
 
@@ -39,7 +41,9 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
-## 3.  thống nhất nội dung Web 
+
+
+## 3.  thống nhất nội dung Web
 
 
 | Người       | Thống nhất gì với Hân                                             | Khi nào                             |
@@ -49,9 +53,12 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 | **Bảo**     | Tên service / port trong compose (ít đụng nội dung trang)         | S2 ghép cụm                         |
 | **Cả nhóm** | 1 lần chốt đề tài + danh sách trang ở trên                        | **Trước hết S1 (trước 25/10)**      |
 
+
 **File gửi Hân (có sẵn tin Zalo copy):** `docs/THONG_NHAT_FE_BE_HAN.md`
 
 ---
+
+
 
 ## 4. Stack kỹ thuật
 
@@ -72,6 +79,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
+
+
 ## 5. Tổng quan vai trò
 
 
@@ -85,7 +94,11 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
+
+
 ## 6. Chi tiết từng người
+
+
 
 ### Hân — Web (React) + DNS + khung/format Word
 
@@ -101,6 +114,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 **Word:** khung + format; Ch.1 (ghi rõ đề tài phòng trọ + SV); Ch.2 sơ đồ; Ch.3–4 Web/DNS.
 
 ---
+
+
 
 ### Vân — Proxy + Application (NestJS) + LB
 
@@ -118,6 +133,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
+
+
 ### Lợi — Database + Auth + MinIO
 
 
@@ -133,6 +150,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 **Word:** Ch.3–4 DB/Auth/MinIO + Ch.5.
 
 ---
+
+
 
 ### Bảo — Monitoring + logging + deploy
 
@@ -151,6 +170,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
+
+
 ## 7. Báo cáo Word
 
 
@@ -165,9 +186,11 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
-## 8. Deadline tổng (nộp trước **03/11/2026**)
 
-> Chốt nội bộ **02/11 tối** (đệm trước hạn 03/11).
+
+## 8. Deadline tổng (nộp **10/11/2026**)
+
+> Chốt nội bộ **09/11 tối** (đệm trước hạn **10/11**).
 
 
 | Mốc                               | Ngày            | Mục tiêu                             |
@@ -176,8 +199,11 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 | **S1 xong**                       | **25/10**       | Demo riêng từng người + ảnh          |
 | **S2 xong**                       | **28/10**       | Compose đủ 9 server + ping (~5 điểm) |
 | **S3 xong**                       | **31/10**       | E2E + mở rộng + EC2 + Hub + video    |
-| **S4 xong**                       | **02/11**       | Word đủ, sẵn sàng nộp                |
-| **Nộp**                           | **Trước 03/11** | Theo LMS / GV                        |
+| **Bổ sung A (parity mẫu)**        | **07/11**       | Register, booking, JWT, `/minio/`,…  |
+| **S4 xong**                       | **09/11**       | Word đủ, sẵn sàng nộp                |
+| **Nộp**                           | **10/11**       | Theo LMS / GV                        |
+
+
 
 
 ### Deadline theo người
@@ -190,7 +216,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 | **24/10**    | Chốt trang với Vân/Lợi; React Home → Nginx `:8080`; DNS `dig` + ảnh |
 | **27/10**    | Web gắn compose; vào được qua proxy `/`                             |
 | **30/10**    | UI E2E đủ trang §2; DNS records mở rộng                             |
-| **01–02/11** | Word Ch.1–2, Ch.3–4 Web/DNS; format cuối                            |
+| **01–07/11** | FE bổ sung A1 Register (+ A2 form booking); giữ UI MiniHome         |
+| **08–09/11** | Word Ch.1–2, Ch.3–4 Web/DNS; format cuối                            |
 
 
 **Vân**
@@ -201,7 +228,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 | **24/10**    | Push Git App+Proxy+ảnh; bảng API gửi Hân; `/student` OK |
 | **27/10**    | Test `/api/hello`, `/api/student` qua proxy             |
 | **30/10**    | API rooms (nếu Lợi sẵn); LB ≥ 2 NestJS; route mở rộng   |
-| **01–02/11** | Word Ch.3–4 + Ch.5                                      |
+| **01–07/11** | A2 bookings + A3 JWT + A4 `/minio/` + A7 push Git       |
+| **08–09/11** | Word Ch.3–4 + Ch.5                                      |
 
 
 **Lợi**
@@ -212,7 +240,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 | **24/10**    | Postgres schema mẫu (rooms/SV); Keycloak admin; MinIO + ảnh; gửi Hân note Auth |
 | **27/10**    | Gắn compose; `/auth/` OK                                                       |
 | **30/10**    | Realm/client gắn UI; bucket ảnh phòng; CRUD                                    |
-| **01–02/11** | Word Ch.3–4 + Ch.5                                                             |
+| **01–07/11** | A1 realm Register; A5 rooms seed; A6 avatar bucket                             |
+| **08–09/11** | Word Ch.3–4 + Ch.5                                                             |
 
 
 **Bảo**
@@ -224,12 +253,17 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 | **26/10**    | Compose gắn thêm Web/App/Proxy/DB/Auth… (không chỉ monitoring) |
 | **28/10**    | Full 9 server; ping; điều phối S2                              |
 | **30–31/10** | Loki; Hub; **EC2**; **video**                                  |
-| **01–02/11** | Word + Phụ lục; checklist nộp                                  |
+| **01–07/11** | B1 scrape App; B2–B4 EC2 / video / Hub (chốt trước Word)       |
+| **08–09/11** | Word + Phụ lục; checklist nộp                                  |
 
 
 ---
 
+
+
 ## 9. Sprint & chỗ thống nhất nội dung
+
+
 
 ### Sprint 1 — Build riêng — **25/10**
 
@@ -249,6 +283,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
+
+
 ### Sprint 2 — Ghép cụm ~5 điểm — **28/10**
 
 **Thống nhất:** FE gọi đúng `/api/`, `/auth/` qua proxy; sửa lệch JSON/path.
@@ -265,6 +301,8 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
+
+
 ### Sprint 3 — E2E + mở rộng + deploy — **31/10**
 
 **Thống nhất sâu:** list/chi tiết phòng thật + login UI + ảnh MinIO.
@@ -280,29 +318,149 @@ Proxy (Vân): `/` → Web, `/api/` → NestJS, `/auth/` → Keycloak.
 
 ---
 
-### Sprint 4 — Báo cáo — **02/11** (nộp trước 03/11)
 
 
-| Người   | Việc                                        |
-| ------- | ------------------------------------------- |
-| **Hân** | Khung Word + format; Ch.1–2; Ch.3–4 Web/DNS |
-| **Vân** | Ch.3–4 Proxy/App/LB + Ch.5                  |
-| **Lợi** | Ch.3–4 DB/Auth/MinIO + Ch.5                 |
-| **Bảo** | Ch.3–4 monitoring/EC2; Phụ lục              |
+### Bổ sung chức năng
+
+
+
+#### A. Bắt buộc — chức năng parity với mẫu (vẫn trong tiêu chí đề / E2E)
+
+
+| #   | Chức năng (như mẫu)  | Ai                | Việc cụ thể                                                                                               | Done khi                  |
+| --- | -------------------- | ----------------- | --------------------------------------------------------------------------------------------------------- | ------------------------- |
+| A1  | **Register** + Login | **Lợi** + **Hân** | Lợi: bật `registrationAllowed` realm `minicloud`. Hân: nút Đăng ký → Keycloak `register()` (UI MiniHome). | User tự đăng ký → vào app |
+
+
+**A1 — Register: cũ vs mới (chi tiết)** *(ngay dưới A1)*
+
+**1. Keycloak (Lợi)**
+
+
+|                       | Hiện tại (cũ)                        | A1 (mới)                           |
+| --------------------- | ------------------------------------ | ---------------------------------- |
+| `registrationAllowed` | `false` trong `minicloud-realm.json` | `true`                             |
+| Ai tạo user           | Admin tạo tay (vd `student_demo`)    | User tự đăng ký trên form Keycloak |
+| Giống bài mẫu         | Chưa (mẫu có Fig Registration)       | Giống mẫu                          |
+
+
+**2. Frontend** `/register` **(Hân) — UI MiniHome giữ nguyên khung**
+
+
+|                               | Hiện tại (cũ)                                                                       | A1 (mới)                                                                                |
+| ----------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Mode **mock**                 | Form họ tên + email + mật khẩu → `authService.register` giả (không Keycloak)        | Có thể giữ cho offline                                                                  |
+| Mode **Keycloak** (đang chạy) | Trang `/register` vẫn mở nhưng text: *“Tài khoản được cấp bởi quản trị viên”*       | Đổi copy + hành vi: **Đăng ký qua Keycloak**                                            |
+| Nút chính khi `keycloak`      | Chỉ **“Đăng nhập qua Keycloak”** (`loginWithKeycloak`) — cả trang register cũng vậy | Thêm / đổi thành gọi `keycloak.register()` (hoặc URL registrations) khi `register=true` |
+| `keycloak.ts`                 | Không có hàm register                                                               | Thêm `registerWithKeycloak(redirect)`                                                   |
+
+
+→ **Cũ:** route `/register` gần như “login giả trang đăng ký”.  
+→ **A1:** `/register` thật sự mở màn hình đăng ký Keycloak (như mẫu), UI bọc ngoài vẫn MiniHome.
+
+**Flow**
+
+```
+Cũ (api/keycloak):  /register → nút → Keycloak LOGIN → cần user admin đã tạo
+A1:                 /register → “Đăng ký qua Keycloak” → Keycloak REGISTER → redirect app
+                    /login    → Keycloak LOGIN (giữ như hiện tại)
+```
+
+**Việc sửa:** Lợi bật `registrationAllowed`; Hân thêm `registerWithKeycloak` + đổi nút/copy trang register. Không đổi theme layout MiniHome.
+
+
+| #   | Chức năng (như mẫu)                              | Ai                | Việc cụ thể                                                                                                                                                 | Done khi                                |
+| --- | ------------------------------------------------ | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| A2  | **Đặt lịch / booking** (mẫu: Nest xử lý booking) | **Vân** + **Hân** | Vân: bảng `bookings` + `POST /api/bookings` (JWT hoặc user id). Proxy location nếu cần. Hân: bật form hẹn xem ở mode `api`, gọi API (không đổi layout lớn). | Sau login đặt lịch được lưu DB          |
+| A3  | **API có JWT** (mẫu: Nest validate OIDC)         | **Vân**           | Guard JWKS realm `minicloud` cho route cần bảo vệ (vd bookings; tuỳ chọn rooms ghi). FE đã gửi Bearer.                                                      | Call không token → 401                  |
+| A4  | **MinIO qua proxy** (mẫu: `/minio/`)             | **Vân**           | `location /minio/` → object-storage (console hoặc rewrite API). Lợi: xác nhận URL ảnh vẫn public/ổn.                                                        | Vào MinIO qua `http://localhost/minio/` |
+| A5  | **Rooms đủ dùng filter** (mẫu: search phòng)     | **Lợi** + **Vân** | Lợi: seed thêm field/`available`/nhiều phòng nếu thiếu. Vân: map JSON optional FE đã có.                                                                    | Filter FE API mode có dữ liệu thật      |
+| A6  | **Avatar / object phụ** (mẫu: ảnh user + phòng)  | **Lợi**           | Bucket `profile-pics` (hoặc tương đương đề mở rộng avatar) + 1 ảnh demo; ghi URL trong note.                                                                | Upload/xem được qua MinIO               |
+| A7  | **Push Git** phần seed/compose còn local         | **Vân**           | `seed-rooms.sh`, compose FE args, schema `image_url`, note Auth.                                                                                            | `main` remote đủ seed                   |
+
+
+
+
+#### B. Vận hành / minh chứng — đề bắt buộc, mẫu nhóm trước làm rất rõ
+
+
+| #   | Việc                                                                       | Ai                                            | Done khi                        |
+| --- | -------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------- |
+| B1  | Scrape Prometheus thêm **App** (`/metrics` hoặc health)                    | **Bảo** (+ **Vân** expose `/metrics` nếu cần) | Target app **UP**               |
+| B2  | EC2 chạy đủ 9 loại + ảnh/log                                               | **Bảo**                                       | Phụ lục Word có minh chứng      |
+| B3  | Video E2E: list → register/login → chi tiết/ảnh → (booking) → student/blog | **Bảo** (quay) + cả nhóm hỗ trợ               | Link YouTube/Drive trong README |
+| B4  | Docker Hub ≥ 1 image (nên thêm web hoặc app như mẫu)                       | **Bảo** / **Vân**                             | Link Hub trong Phụ lục          |
+
+
+
+
+#### C. Tuỳ chọn điểm cao (mẫu có — đề không bắt)
+
+
+| #   | Việc                                   | Ai                             | Ghi chú                          |
+| --- | -------------------------------------- | ------------------------------ | -------------------------------- |
+| C1  | Scale App **3–4** instance Round Robin | **Vân** + **Bảo** (compose)    | Đề chỉ cần ≥ 2; mẫu dùng 4       |
+| C2  | Alertmanager + rule CPU/mail           | **Bảo**                        | Mẫu Fig 4.12–4.23                |
+| C3  | Ollama gợi ý phòng                     | **Vân** hoặc **Hân** (gọi API) | Mẫu dịch vụ 11 — nặng tài nguyên |
+| C4  | Proxy `/grafana/` `/prometheus/`       | **Vân**                        | Tiện demo một cổng 80            |
+
+
+
+
+#### Phân công tóm theo người (chỉ phần bổ sung)
+
+
+| Người   | Việc bổ sung phụ trách                                                                                                        |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Hân** | Nút Register; nối form hẹn xem → API booking; **không** đổi lại UI theo Airbnb mẫu; giữ Blog + Student                        |
+| **Vân** | `POST /bookings` + JWT guard; proxy `/minio/` (+ tuỳ chọn grafana); map rooms mở rộng; push Git seed/compose; (C1/C4 nếu làm) |
+| **Lợi** | Bật Register realm; schema/seed booking + rooms field; bucket avatar/`profile-pics`; note Auth/MinIO cập nhật                 |
+| **Bảo** | Scrape app; EC2; video E2E đủ flow mới; Hub; (C2 Alertmanager nếu làm)                                                        |
 
 
 ---
 
-### Checklist nộp (chốt **02/11**)
+
+
+### Sprint 4 — Báo cáo — **09/11** (nộp **10/11**)
+
+
+| Người   | Việc                                                                               |
+| ------- | ---------------------------------------------------------------------------------- |
+| **Hân** | Khung Word + format; Ch.1–2; Ch.3–4 Web/DNS; ảnh Register + hẹn xem + Blog/Student |
+| **Vân** | Ch.3–4 Proxy/App/LB + Ch.5; ảnh JWT, bookings, `/minio/`, LB                       |
+| **Lợi** | Ch.3–4 DB/Auth/MinIO + Ch.5; ảnh realm Register, schema, MinIO buckets             |
+| **Bảo** | Ch.3–4 monitoring/EC2; Phụ lục Hub, IP, video, ping, Prometheus targets            |
+
+
+---
+
+
+
+### Checklist nộp (chốt **09/11**; nộp **10/11**)
+
+**Theo đề**
 
 - [ ] 9 loại server chạy (local + EC2)
-- [ ] Mini app E2E: list phòng → login → chi tiết/ảnh (hoặc flow tương đương đã chốt)
-- [ ] Blog ≥ 3 bài (mở rộng Web)
-- [ ] API `/student` (hoặc tương đương) có minh chứng
+- [ ] Mini app E2E: list → auth → chi tiết/ảnh MinIO
+- [ ] Blog ≥ 3 bài
+- [ ] API `/student` có minh chứng
 - [ ] ≥ 1 image Docker Hub
 - [ ] Video + log ping
 - [ ] Word Ch.1–5 + Phụ lục
-- [ ] Ghi rõ số phần mở rộng đề đã làm
+- [ ] Ghi rõ phần mở rộng đề đã làm
+
+**Bổ sung chức năng sát mẫu (nhóm chốt)**
+
+- [ ] Register Keycloak trên UI MiniHome
+- [ ] Booking/hẹn xem lưu qua API (mode api)
+- [ ] Nest JWT cho route bảo vệ
+- [ ] Proxy `/minio/`
+- [ ] Rooms/seed đủ phục vụ filter (hoặc ghi rõ giới hạn)
+- [ ] Bucket avatar / profile-pics demo
+- [ ] Seed MinIO + FE compose đã push Git
+- [ ] Prometheus có target App *(khuyến nghị)*
+- [ ] *(Tuỳ chọn)* Alertmanager / Ollama / scale ≥ 3
 
 ---
 

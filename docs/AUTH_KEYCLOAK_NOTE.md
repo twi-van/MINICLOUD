@@ -69,6 +69,10 @@ Khi Hân tích hợp thư viện OIDC / Keycloak client (như `keycloak-js`, `@r
 
 - MinIO Console: `http://localhost:9001` (user: `minioadmin` / pass: `minioadmin`).
 - S2 đã hoàn thành: Container MinIO chạy trong `cloud-net`, bucket `demo` đã tạo và upload thành công.
-- **Sprint 3:** Lợi sẽ tạo bucket `rooms-images`, upload toàn bộ ảnh phòng thật và cập nhật cột `image_url` trong bảng `rooms` (Postgres) thành URL MinIO (hoặc public static URL) để FE hiển thị trọn vẹn E2E.
+- **Sprint 3 (đã làm):** bucket `rooms-images` + 2 ảnh `room-1.jpg` / `room-2.jpg` (public read).
+  - URL: `http://localhost:9000/rooms-images/room-1.jpg` (và `room-2.jpg`)
+  - Cột `rooms.image_url` trong Postgres trỏ các URL trên; API `/api/rooms` trả `imageUrl` tương ứng.
+  - Seed lại (macOS/Linux): `bash object-storage-server/seed-rooms.sh`  
+    (Windows: `object-storage-server/seed-rooms.ps1`)
 
 

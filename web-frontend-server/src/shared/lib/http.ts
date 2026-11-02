@@ -27,6 +27,29 @@ export async function getJson(path: string, signal?: AbortSignal): Promise<unkno
   return response.json()
 }
 
+export async function postJson(
+  path: string,
+  body: unknown,
+  signal?: AbortSignal,
+): Promise<unknown> {
+  const token = await getAccessToken()
+  signal?.throwIfAborted()
+  const response = await fetch(`${config.apiBaseUrl}${path}`, {
+    method: 'POST',
+    signal,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body),
+  })
+  if (!response.ok) {
+    throw new ApiError('Không thể gửi lịch hẹn. Vui lòng thử lại.', response.status)
+  }
+  return response.json()
+}
+
 export async function mockResponse<T>(data: T, signal?: AbortSignal): Promise<T> {
   signal?.throwIfAborted()
   await new Promise<void>((resolve, reject) => {

@@ -108,6 +108,15 @@ export async function loginWithKeycloak(path?: string) {
   await client.login({ redirectUri: new URL(safeRedirect(path), window.location.origin).href })
 }
 
+/** Open Keycloak's self-registration page and return to the requested route. */
+export async function registerWithKeycloak(path?: string) {
+  await initializeKeycloak()
+  if (!client) throw new Error('Dịch vụ đăng ký chưa sẵn sàng.')
+  await client.register({
+    redirectUri: new URL(safeRedirect(path), window.location.origin).href,
+  })
+}
+
 export async function logoutFromKeycloak() {
   if (!client) return
   rememberSession(false)

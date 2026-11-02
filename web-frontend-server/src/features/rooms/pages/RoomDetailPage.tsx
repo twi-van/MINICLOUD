@@ -25,7 +25,8 @@ import {
 } from '@ant-design/icons'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { roomsService } from '../services/rooms.service'
-import { currency, priceLabel } from '../lib/room.utils'
+import { bookingsService } from '../services/bookings.service'
+import { currency, priceLabel, resolveRoomImage } from '../lib/room.utils'
 import { useFavorites } from '../hooks/favorites.context'
 import { useAuth } from '../../auth/hooks/auth.context'
 import { useResource } from '../../../shared/hooks/useResource'
@@ -43,6 +44,7 @@ export default function RoomDetailPage() {
   const { message } = App.useApp()
   const [open, setOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [bookingLoading, setBookingLoading] = useState(false)
   const saved = room ? ids.includes(room.id) : false
   const requestVisit = () => {
     if (!user) return navigate(`/login?redirect=${encodeURIComponent(`/rooms/${id}`)}`)
@@ -106,7 +108,7 @@ export default function RoomDetailPage() {
           {images.map((src, index) => (
             <Image
               key={`${src}-${index}`}
-              src={src}
+              src={resolveRoomImage(src)}
               alt={`${room.title} — ảnh ${index + 1}`}
               className="!h-full !w-full !object-cover"
               fallback="/images/room-placeholder.svg"
@@ -177,14 +179,12 @@ export default function RoomDetailPage() {
             type="primary"
             size="large"
             icon={<CalendarOutlined />}
-            disabled={room.available === false || config.dataSource !== 'mock'}
+            disabled={room.available === false}
             onClick={requestVisit}
           >
             {room.available === false
               ? 'Phòng đã cho thuê'
-              : config.dataSource !== 'mock'
-                ? 'Chưa có dịch vụ đặt lịch'
-                : 'Hẹn xem phòng'}
+              : 'Hẹn xem phòng'}
           </Button>
           <div className="mt-4 flex items-start gap-3 rounded-lg bg-sand p-4 text-xs leading-5 text-muted">
             <SafetyCertificateOutlined className="mt-1 text-lg text-brand" />
@@ -202,8 +202,12 @@ export default function RoomDetailPage() {
         {submitted ? (
           <Result
             status="info"
-            title="Lịch hẹn chưa được gửi"
-            subTitle="Thông tin liên hệ không được lưu. Vui lòng liên hệ trực tiếp để xác nhận lịch xem phòng."
+            title={config.dataSource === 'api' ? 'Đã gửi lịch hẹn' : 'Đã mô phỏng lịch xem phòng'}
+            subTitle={
+              config.dataSource === 'api'
+                ? 'Yêu cầu đã được lưu. Nhóm sẽ liên hệ để xác nhận lịch xem phòng.'
+                : 'Đây là luồng demo offline; thông tin liên hệ chưa được lưu.'
+            }
             extra={
               <Button type="primary" onClick={() => setOpen(false)}>
                 Tiếp tục khám phá
@@ -215,7 +219,27 @@ export default function RoomDetailPage() {
             <Form
               layout="vertical"
               requiredMark={false}
-              onFinish={() => setSubmitted(true)}
+              onFinish={async (values) => {
+                if (config.dataSource === 'mock') {
+                  setSubmitted(true)
+                  return
+                }
+                setBookingLoading(true)
+                try {
+                  await bookingsService.create({
+                    roomId: room.id,
+                    guestName: values.name,
+                    phone: values.phone,
+                    visitDate: values.date.format('YYYY-MM-DD'),
+                  })
+                  setSubmitted(true)
+                  message.success('Đã gửi yêu cầu hẹn xem phòng.')
+                } catch (error) {
+                  message.error(error instanceof Error ? error.message : 'Vui lòng thử lại.')
+                } finally {
+                  setBookingLoading(false)
+                }
+              }}
               initialValues={{ name: user?.name }}
             >
               <Form.Item
@@ -249,7 +273,7 @@ export default function RoomDetailPage() {
                   }
                 />
               </Form.Item>
-              <Button block htmlType="submit" type="primary">
+              <Button block htmlType="submit" type="primary" loading={bookingLoading}>
                 Tiếp tục
               </Button>
             </Form>

@@ -21,11 +21,3 @@ scrape_configs:
   - job_name: 'loki'
     static_configs:
       - targets: ['loki:3100']
-
-# 5. Giam sat Application Backend (NestJS)
-  - job_name: 'application-backend'
-    metrics_path: '/metrics'
-    static_configs:
-      - targets:
-          - 'application-backend-server-1:8081'
-          - 'application-backend-server-2:8081'

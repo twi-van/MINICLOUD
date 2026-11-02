@@ -277,6 +277,51 @@ test('api adapter accepts minimal agreed room and student DTOs', async ({ page }
   await expect(page.locator('tbody')).toContainText('API Student')
 })
 
+test('api booking sends the agreed payload and shows the saved result', async ({ page }) => {
+  await page.route('**/api/rooms/1', (route) =>
+    route.fulfill({
+      json: {
+        id: 1,
+        title: 'Phòng booking API',
+        address: 'Quận 7, TP.HCM',
+        price: 3500000,
+        area: 25,
+        imageUrl: '/images/room-1.jpg',
+        available: true,
+      },
+    }),
+  )
+  let requestBody: Record<string, unknown> | undefined
+  await page.route('**/api/bookings', async (route) => {
+    requestBody = route.request().postDataJSON() as Record<string, unknown>
+    await route.fulfill({
+      status: 201,
+      json: { id: 9, roomId: 1, status: 'pending' },
+    })
+  })
+
+  await page.goto('http://127.0.0.1:4174/rooms/1')
+  await page.getByRole('button', { name: 'Hẹn xem phòng' }).click()
+  await expect(page).toHaveURL(/\/login\?redirect=/)
+  await page.getByRole('textbox', { name: 'Email', exact: true }).fill('api@example.com')
+  await page.getByLabel('Mật khẩu trải nghiệm', { exact: true }).fill('demo123')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Đăng nhập trải nghiệm' }).click()
+  await expect(page).toHaveURL(/\/rooms\/1$/)
+  await page.getByRole('button', { name: 'Hẹn xem phòng' }).click()
+  await page.getByRole('textbox', { name: 'Số điện thoại mẫu' }).fill('0900000000')
+  await page.getByRole('textbox', { name: 'Ngày xem phòng' }).fill('30/11/2030')
+  await page.getByRole('textbox', { name: 'Ngày xem phòng' }).press('Enter')
+  await page.getByRole('button', { name: 'Tiếp tục' }).click()
+  await expect(page.getByText('Đã gửi lịch hẹn')).toBeVisible()
+  expect(requestBody).toEqual({
+    roomId: 1,
+    guestName: 'api@example.com',
+    phone: '0900000000',
+    visitDate: '2030-11-30',
+  })
+})
+
 test('api errors expose retry without silently falling back to mock', async ({ page }) => {
   let fail = true
   await page.route('**/api/rooms', (route) =>

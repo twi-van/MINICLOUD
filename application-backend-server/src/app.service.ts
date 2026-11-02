@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { Pool } from 'pg';
@@ -57,7 +61,10 @@ export class AppService {
         if (result.rowCount === 0) {
           throw new NotFoundException(`Room ${id} not found`);
         }
-        return this.mapDbRow(result.rows[0]);
+        const enrichById = new Map(
+          this.readRoomsFile().map((r) => [r.id, r] as const),
+        );
+        return this.mapDbRow(result.rows[0], enrichById);
       } catch (err) {
         if (err instanceof NotFoundException) {
           throw err;
@@ -70,6 +77,58 @@ export class AppService {
       throw new NotFoundException(`Room ${id} not found`);
     }
     return room;
+  }
+
+  /** A2 — lưu lịch hẹn (khớp schema Lợi: user_id/name/phone/visit_date). */
+  async createBooking(input: {
+    roomId: number;
+    userSub: string;
+    userEmail?: string;
+    guestName: string;
+    phone: string;
+    visitDate: string;
+    note?: string;
+  }) {
+    const pool = this.getPool();
+    if (!pool) {
+      throw new ServiceUnavailableException('Database chưa cấu hình');
+    }
+
+    const room = await pool.query(`SELECT id FROM rooms WHERE id = $1`, [
+      input.roomId,
+    ]);
+    if (room.rowCount === 0) {
+      throw new NotFoundException(`Room ${input.roomId} not found`);
+    }
+
+    const result = await pool.query(
+      `INSERT INTO bookings (room_id, user_id, user_email, name, phone, visit_date, note, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+       RETURNING id, room_id, user_id, user_email, name, phone, visit_date, note, status, created_at`,
+      [
+        input.roomId,
+        input.userSub,
+        input.userEmail ?? null,
+        input.guestName,
+        input.phone,
+        input.visitDate,
+        input.note ?? '',
+      ],
+    );
+
+    const row = result.rows[0];
+    return {
+      id: Number(row.id),
+      roomId: Number(row.room_id),
+      userId: row.user_id as string,
+      userEmail: row.user_email as string | null,
+      guestName: row.name as string,
+      phone: row.phone as string,
+      visitDate: row.visit_date,
+      note: row.note as string,
+      status: row.status as string,
+      createdAt: row.created_at,
+    };
   }
 
   private readRoomsFile(): Room[] {
@@ -132,23 +191,37 @@ export class AppService {
     return this.pool;
   }
 
-  private mapDbRow(row: {
-    id: string | number;
-    title: string;
-    address: string;
-    price: string | number;
-    area: string | number;
-    description?: string;
-    image_url?: string | null;
-  }): Room {
+  private mapDbRow(
+    row: {
+      id: string | number;
+      title: string;
+      address: string;
+      price: string | number;
+      area: string | number;
+      description?: string;
+      image_url?: string | null;
+    },
+    enrichById?: Map<number, Room>,
+  ): Room {
+    const id = Number(row.id);
+    const fromFile = enrichById?.get(id);
+    // A5 — DB thường chỉ có field cơ bản; ghép optional từ rooms.json cho filter FE
     return this.normalizeRoom({
-      id: Number(row.id),
+      id,
       title: row.title,
       address: row.address,
       price: Number(row.price),
       area: Number(row.area),
-      description: row.description ?? '',
-      imageUrl: row.image_url || '/images/room-placeholder.svg',
+      description: row.description ?? fromFile?.description ?? '',
+      imageUrl:
+        row.image_url ||
+        fromFile?.imageUrl ||
+        '/images/room-placeholder.svg',
+      district: fromFile?.district,
+      type: fromFile?.type,
+      amenities: fromFile?.amenities,
+      images: fromFile?.images,
+      available: fromFile?.available,
     });
   }
 
@@ -164,7 +237,10 @@ export class AppService {
          FROM rooms
          ORDER BY id`,
       );
-      return result.rows.map((row) => this.mapDbRow(row));
+      const enrichById = new Map(
+        this.readRoomsFile().map((r) => [r.id, r] as const),
+      );
+      return result.rows.map((row) => this.mapDbRow(row, enrichById));
     } catch {
       return null;
     }

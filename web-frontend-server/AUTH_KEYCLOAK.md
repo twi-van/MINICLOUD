@@ -28,12 +28,11 @@ curl http://localhost/auth/realms/minicloud/.well-known/openid-configuration
 5. Nút **Đăng xuất** cạnh tài khoản (hoặc trong menu di động) kết thúc phiên
    Keycloak và trở về trang chủ.
 
-Realm hiện không cho tự đăng ký. Quản trị viên tạo tài khoản trong realm
-`minicloud` tại `http://localhost:8082/admin/`, bật user, đặt mật khẩu với
-Temporary = Off, hoàn tất các required actions trước khi demo. File import
-chỉ tạo realm/client/role, không chứa user. Tài khoản `student_demo` ghi trong
-handoff phải được tạo nếu realm đang chạy chưa có nó. Import không cập nhật
-đè realm đã tồn tại; khi đó đối chiếu client trong Admin Console, không xóa volume.
+Realm đã bật tự đăng ký. Tại `/register`, nút **Đăng ký qua Keycloak** gọi
+`keycloak.register()` và đưa người dùng về route đang xem sau khi tạo tài khoản.
+Tài khoản `student_demo` vẫn cần được tạo riêng nếu dùng cho kiểm thử E2E đăng nhập.
+Nếu realm đang chạy dùng volume cũ, chạy `authentication-identity-server/enable-register.sh`
+để cập nhật `registrationAllowed=true` mà không xóa volume.
 
 ## Cấu hình frontend
 

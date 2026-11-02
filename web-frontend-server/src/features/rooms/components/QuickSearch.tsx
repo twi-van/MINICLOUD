@@ -7,7 +7,7 @@ import { useResource } from '../../../shared/hooks/useResource'
 import { ResourceState } from '../../../shared/components/ResourceState'
 import { normalize } from '../../../shared/lib/text'
 import { SafeImage } from '../../../shared/components/SafeImage'
-import { priceLabel } from '../lib/room.utils'
+import { priceLabel, resolveRoomImage } from '../lib/room.utils'
 
 export function QuickSearch({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState('')
@@ -86,7 +86,7 @@ export function QuickSearch({ open, onClose }: { open: boolean; onClose: () => v
               onClick={() => go(room.id)}
             >
               <SafeImage
-                src={room.imageUrl}
+                src={resolveRoomImage(room.imageUrl)}
                 alt=""
                 className="size-16 shrink-0 rounded-xl object-cover"
               />

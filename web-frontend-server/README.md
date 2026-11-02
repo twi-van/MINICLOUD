@@ -104,11 +104,11 @@ Hiện lọc/sắp xếp/phân trang ở frontend vì contract chỉ có mảng.
 
 Chế độ API mặc định dùng Keycloak tại `http://localhost/auth`, realm `minicloud`, client public `web-frontend`. Nút **Đăng nhập qua Keycloak** chuyển đến Keycloak; callback được xử lý trước React Router và đưa người dùng về trang đã chọn. Adapter dùng Authorization Code + PKCE S256, khôi phục phiên sau reload, refresh token trước request API và đăng xuất khỏi SSO. Token chỉ nằm trong bộ nhớ; sessionStorage chỉ lưu cờ boolean phục vụ kiểm tra SSO khi tải lại.
 
-Realm hiện tắt tự đăng ký, nên trang `/register` hướng dẫn dùng tài khoản được quản trị viên cấp. Không nhập mật khẩu Keycloak trên React. `VITE_AUTH_MODE=mock` giữ adapter offline để kiểm thử giao diện. `VITE_AUTH_MODE=keycloak` có thể dùng độc lập với nguồn dữ liệu phòng. Cấu hình và kiểm thử thật: [AUTH_KEYCLOAK.md](AUTH_KEYCLOAK.md).
+Realm đã bật tự đăng ký; trang `/register` mở màn hình đăng ký của Keycloak bằng `keycloak.register()` rồi quay lại route đã chọn. Không nhập mật khẩu Keycloak trên React. `VITE_AUTH_MODE=mock` giữ adapter offline để kiểm thử giao diện. `VITE_AUTH_MODE=keycloak` có thể dùng độc lập với nguồn dữ liệu phòng. Cấu hình và kiểm thử thật: [AUTH_KEYCLOAK.md](AUTH_KEYCLOAK.md).
 
-Các request API sau đăng nhập có header Bearer; backend hiện vẫn có API công khai, chưa có guard xác minh token. Thao tác hẹn xem phòng vẫn bị tắt trong chế độ API vì chưa có contract đặt lịch.
+Các request API sau đăng nhập có header Bearer; `POST /api/bookings` dùng Bearer token để lưu lịch hẹn. Các API đọc phòng/sinh viên vẫn công khai.
 
-Luồng demo: chi tiết → hẹn xem → login → quay lại chi tiết → điền lịch → xác nhận mô phỏng. Không có request gửi chủ nhà, không lưu số điện thoại hay lịch hẹn.
+Luồng mock: chi tiết → hẹn xem → login → điền lịch → xác nhận mô phỏng. Luồng API gửi `POST /api/bookings` với Bearer token.
 
 ## Docker / Nginx
 

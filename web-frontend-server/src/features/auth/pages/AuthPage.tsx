@@ -13,7 +13,7 @@ import { authService } from '../services/auth.service'
 import type { RegisterInput } from '../types'
 import { SafeImage } from '../../../shared/components/SafeImage'
 import { config } from '../../../shared/lib/config'
-import { loginWithKeycloak, safeRedirect } from '../services/keycloak'
+import { loginWithKeycloak, registerWithKeycloak, safeRedirect } from '../services/keycloak'
 
 export default function AuthPage({ register = false }: { register?: boolean }) {
   const [loading, setLoading] = useState(false)
@@ -27,19 +27,17 @@ export default function AuthPage({ register = false }: { register?: boolean }) {
     if (keycloakMode && user) navigate(redirect, { replace: true })
   }, [keycloakMode, user, navigate, redirect])
 
-  const login = async () => {
+  const continueToKeycloak = async () => {
     setLoading(true)
     try {
-      if (keycloakMode) {
-        await loginWithKeycloak(redirect)
-      } else {
-        // In mock mode, redirect directly to the Keycloak account page
-        const kcUrl = config.keycloak.url.replace(/\/$/, '')
-        const realm = config.keycloak.realm
-        window.location.href = `${kcUrl}/realms/${realm}/account`
-      }
+      if (register) await registerWithKeycloak(redirect)
+      else await loginWithKeycloak(redirect)
     } catch {
-      message.error('Không thể mở trang đăng nhập. Vui lòng thử lại.')
+      message.error(
+        register
+          ? 'Không thể mở trang đăng ký. Vui lòng thử lại.'
+          : 'Không thể mở trang đăng nhập. Vui lòng thử lại.',
+      )
     } finally {
       setLoading(false)
     }
@@ -100,7 +98,7 @@ export default function AuthPage({ register = false }: { register?: boolean }) {
               {error && <Alert type="warning" showIcon title={error} />}
               <p className="text-sm leading-6 text-muted">
                 {register
-                  ? 'Tài khoản được cấp bởi quản trị viên. Nếu đã có tài khoản, bạn có thể đăng nhập bên dưới.'
+                  ? 'Bạn sẽ được chuyển đến Keycloak để tạo tài khoản rồi quay lại trang đang xem.'
                   : 'Bạn sẽ được chuyển đến trang Keycloak để đăng nhập và quay lại trang đang xem.'}
               </p>
               <Button
@@ -108,11 +106,11 @@ export default function AuthPage({ register = false }: { register?: boolean }) {
                 type="primary"
                 size="large"
                 loading={loading}
-                onClick={login}
+                onClick={continueToKeycloak}
                 icon={<ArrowRightOutlined />}
                 iconPlacement="end"
               >
-                Đăng nhập qua Keycloak
+                {register ? 'Đăng ký qua Keycloak' : 'Đăng nhập qua Keycloak'}
               </Button>
               <Link className="text-link" to="/rooms">
                 Tiếp tục xem phòng
@@ -215,7 +213,7 @@ export default function AuthPage({ register = false }: { register?: boolean }) {
                 block
                 size="large"
                 loading={loading}
-                onClick={login}
+                onClick={continueToKeycloak}
                 className="mt-4"
                 icon={<ArrowRightOutlined />}
                 iconPlacement="end"

@@ -21,3 +21,11 @@ scrape_configs:
   - job_name: 'loki'
     static_configs:
       - targets: ['loki:3100']
+
+  # 5. Giam sat service API 2 instance sau LB
+  - job_name: 'app'
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - 'application-backend-server-1:8081'
+          - 'application-backend-server-2:8081'

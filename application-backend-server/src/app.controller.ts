@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   Param,
   ParseIntPipe,
   Post,
@@ -12,10 +13,21 @@ import {
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { MetricsService } from './metrics.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly metricsService: MetricsService,
+  ) {}
+
+  /** B1 — Prometheus scrape NestJS App (`text/plain` exposition). */
+  @Get('metrics')
+  @Header('Content-Type', 'text/plain; version=0.0.4; charset=utf-8')
+  getMetrics(): string {
+    return this.metricsService.render();
+  }
 
   @Get('hello')
   getHello() {

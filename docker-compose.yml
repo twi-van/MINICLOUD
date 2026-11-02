@@ -91,6 +91,9 @@ services:
       - POSTGRES_USER=minicloud
       - POSTGRES_PASSWORD=minicloud_dev
       - POSTGRES_DB=minicloud
+      # A3 JWT — issuer = URL public token; JWKS = Keycloak trong cloud-net
+      - KEYCLOAK_ISSUER=http://localhost/auth/realms/minicloud
+      - KEYCLOAK_JWKS_URI=http://authentication-identity-server:8080/realms/minicloud/protocol/openid-connect/certs
     depends_on:
       relational-database-server:
         condition: service_healthy
@@ -114,6 +117,8 @@ services:
       - POSTGRES_USER=minicloud
       - POSTGRES_PASSWORD=minicloud_dev
       - POSTGRES_DB=minicloud
+      - KEYCLOAK_ISSUER=http://localhost/auth/realms/minicloud
+      - KEYCLOAK_JWKS_URI=http://authentication-identity-server:8080/realms/minicloud/protocol/openid-connect/certs
     depends_on:
       relational-database-server:
         condition: service_healthy

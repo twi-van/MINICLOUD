@@ -172,6 +172,60 @@ CREATE TABLE IF NOT EXISTS bookings (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Volume cũ (A2 sớm): cột user_sub/guest_name → đổi sang schema parity
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = current_schema()
+          AND table_name = 'bookings' AND column_name = 'user_sub'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = current_schema()
+          AND table_name = 'bookings' AND column_name = 'user_id'
+    ) THEN
+        ALTER TABLE bookings RENAME COLUMN user_sub TO user_id;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = current_schema()
+          AND table_name = 'bookings' AND column_name = 'guest_name'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = current_schema()
+          AND table_name = 'bookings' AND column_name = 'name'
+    ) THEN
+        ALTER TABLE bookings RENAME COLUMN guest_name TO name;
+    END IF;
+END;
+$$;
+
+ALTER TABLE bookings
+    ADD COLUMN IF NOT EXISTS user_id TEXT,
+    ADD COLUMN IF NOT EXISTS user_email TEXT,
+    ADD COLUMN IF NOT EXISTS name TEXT NOT NULL DEFAULT '',
+    ADD COLUMN IF NOT EXISTS phone TEXT NOT NULL DEFAULT '',
+    ADD COLUMN IF NOT EXISTS visit_date TEXT NOT NULL DEFAULT '',
+    ADD COLUMN IF NOT EXISTS note TEXT NOT NULL DEFAULT '',
+    ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending';
+
+-- visit_date kiểu DATE (schema A2 cũ) → TEXT để khớp seed/FE
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = current_schema()
+          AND table_name = 'bookings'
+          AND column_name = 'visit_date'
+          AND data_type = 'date'
+    ) THEN
+        ALTER TABLE bookings
+            ALTER COLUMN visit_date TYPE TEXT USING visit_date::text;
+    END IF;
+END;
+$$;
+
 INSERT INTO bookings (id, room_id, user_id, user_email, name, phone, visit_date, note, status)
 VALUES (
     1,

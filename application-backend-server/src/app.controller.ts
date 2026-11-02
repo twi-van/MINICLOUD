@@ -1,5 +1,17 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AppService } from './app.service';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
@@ -23,5 +35,51 @@ export class AppController {
   @Get('rooms/:id')
   getRoomById(@Param('id', ParseIntPipe) id: number) {
     return this.appService.getRoomById(id);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req: { user?: Record<string, unknown> }) {
+    const user = req.user ?? {};
+    return {
+      sub: user.sub,
+      preferred_username: user.preferred_username,
+      email: user.email,
+      realm: 'minicloud',
+    };
+  }
+
+  /** A2 — đặt lịch hẹn xem phòng (bắt buộc Bearer Keycloak). */
+  @Post('bookings')
+  @UseGuards(JwtAuthGuard)
+  createBooking(
+    @Req() req: { user?: Record<string, unknown> },
+    @Body()
+    body: {
+      roomId?: number;
+      guestName?: string;
+      phone?: string;
+      visitDate?: string;
+    },
+  ) {
+    const userSub = String(req.user?.sub ?? '');
+    if (!userSub) {
+      throw new UnauthorizedException('Token thiếu sub');
+    }
+    if (!body.roomId || !body.guestName || !body.phone || !body.visitDate) {
+      throw new BadRequestException(
+        'Thiếu roomId / guestName / phone / visitDate',
+      );
+    }
+    const userEmail =
+      typeof req.user?.email === 'string' ? req.user.email : undefined;
+    return this.appService.createBooking({
+      roomId: Number(body.roomId),
+      userSub,
+      userEmail,
+      guestName: body.guestName.trim(),
+      phone: body.phone.trim(),
+      visitDate: body.visitDate,
+    });
   }
 }

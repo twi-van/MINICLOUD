@@ -11,7 +11,7 @@ import { App, Tooltip } from 'antd'
 import { motion, useReducedMotion } from 'motion/react'
 import type { CSSProperties } from 'react'
 import type { Room } from '../types'
-import { priceLabel, roomDistrict } from '../lib/room.utils'
+import { priceLabel, resolveRoomImage, roomDistrict } from '../lib/room.utils'
 import { useFavorites } from '../hooks/favorites.context'
 import { SafeImage } from '../../../shared/components/SafeImage'
 
@@ -30,7 +30,7 @@ export function RoomCard({ room }: { room: Room }) {
       <div className="room-card-media relative overflow-hidden rounded-xl">
         <Link to={`/rooms/${room.id}`} tabIndex={-1} aria-hidden="true">
           <SafeImage
-            src={room.imageUrl}
+            src={resolveRoomImage(room.imageUrl)}
             alt={room.title}
             className="aspect-[1.48] w-full object-cover transition duration-200 group-hover:scale-[1.03]"
           />

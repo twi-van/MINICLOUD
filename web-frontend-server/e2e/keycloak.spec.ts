@@ -74,15 +74,15 @@ test('real login, callback, reload, token refresh, authenticated API and logout'
   expect(await page.evaluate(() => sessionStorage.getItem('minihome:keycloak-session'))).toBeNull()
 })
 
-test('registration reflects the realm policy instead of creating a mock account', async ({
+test('registration opens Keycloak self-registration instead of creating a mock account', async ({
   page,
 }) => {
   await page.goto('/register')
   await expect(
-    page.getByText('Tài khoản được cấp bởi quản trị viên.', { exact: false }),
+    page.getByText('Bạn sẽ được chuyển đến Keycloak để tạo tài khoản', { exact: false }),
   ).toBeVisible()
   await expect(page.locator('input[type="password"]')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Đăng nhập qua Keycloak' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Đăng ký qua Keycloak' })).toBeVisible()
 })
 
 test('mobile users can sign in and sign out from the navigation drawer', async ({

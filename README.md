@@ -55,7 +55,7 @@ cloud/
 | ------- | --------- |
 | Proxy (API Gateway) | 80 |
 | Web | 8080 |
-| Auth (Keycloak) | 8081 |
+| Auth (Keycloak) | 8082 |
 | App API | 8085 (container 8081) |
 | Grafana | 3000 |
 | MinIO API / Console | 9000 / 9001 |

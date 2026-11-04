@@ -46,7 +46,7 @@ cloud/
 ├── object-storage-server/          ← Lợi
 ├── monitoring-prometheus-server/   ← Bảo
 ├── monitoring-grafana-dashboard-server/ ← Bảo
-└── docs/screenshots/
+└── docs/                           ← báo cáo Word (nếu có)
 ```
 
 ## Cổng dịch vụ
@@ -56,12 +56,12 @@ cloud/
 | Proxy (API Gateway) | 80 |
 | Web | 8080 |
 | Auth (Keycloak) | 8082 |
-| App API | 8085 (container 8081) |
+| App API (instance 1 / 2) | 8085 / 8086 (container 8081) |
 | Grafana | 3000 |
 | MinIO API / Console | 9000 / 9001 |
 | Prometheus | 9090 |
 | Node Exporter | 9100 |
-| DNS | 1053/udp |
+| DNS | 1053/udp · 1053/tcp |
 | PostgreSQL | 5432 |
 
 ## Tài khoản demo (mặc định)
@@ -80,7 +80,9 @@ Yêu cầu: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 **Sprint 2–3 — App × 2 (LB) + Proxy + Web:** từ thư mục gốc repo:
 
 ```bash
-docker network create cloud-net   # nếu chưa có (compose dùng external network)
+# Mạng cố định khớp zone Bind9 (db.cloud.local dùng 172.20.0.x)
+docker network create --subnet=172.20.0.0/16 --gateway=172.20.0.1 cloud-net \
+  2>/dev/null || true
 
 docker compose up -d --build \
   application-backend-server-1 \
@@ -102,6 +104,9 @@ Chạy cả stack (khi đã merge đủ service):
 ```bash
 docker compose up -d --build
 docker compose ps
+
+# Ảnh phòng MinIO (nếu Object Browser trống)
+bash object-storage-server/seed-rooms.sh
 ```
 
 Dừng:
@@ -113,7 +118,7 @@ docker compose down
 ## Kiểm thử nhanh
 
 ```bash
-# Qua proxy (S2)
+# Qua proxy — dùng http://localhost/ (không dùng localhost.cloud)
 curl http://localhost/api/hello
 curl http://localhost/api/student
 curl http://localhost/api/rooms
@@ -124,14 +129,17 @@ curl -I http://localhost/auth/
 curl -I http://localhost:8080/
 curl -s http://localhost:8085/hello
 
-# DNS
+# DNS (kỳ vọng trùng IP tĩnh compose, vd web → 172.20.0.10)
 dig @127.0.0.1 -p 1053 web-frontend-server.cloud.local +short
+dig @127.0.0.1 -p 1053 keycloak.cloud.local +short
 ```
 
+- App / Login: http://localhost/ · http://localhost/login  
+- Keycloak (admin trực tiếp): http://localhost:8082  
+- Keycloak qua proxy: http://localhost/auth/  
 - Prometheus: http://localhost:9090 → Status → Targets  
 - Grafana: http://localhost:3000  
-- MinIO: http://localhost:9001  
-- Keycloak: http://localhost:8081  
+- MinIO Console: http://localhost:9001  
 
 ## Phân công mở rộng / E2E (tóm tắt)
 

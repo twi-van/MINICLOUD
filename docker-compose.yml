@@ -12,8 +12,8 @@ services:
       - "9100:9100"
     restart: unless-stopped
     networks:
-      - cloud-net
-
+      cloud-net:
+        ipv4_address: 172.20.0.3
 
   monitoring-prometheus-server:
     build:
@@ -25,8 +25,8 @@ services:
       - "9090:9090"
     restart: unless-stopped
     networks:
-      - cloud-net
-
+      cloud-net:
+        ipv4_address: 172.20.0.15
 
   loki:
     image: grafana/loki:latest
@@ -38,7 +38,8 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.5
 
   promtail:
     image: grafana/promtail:latest
@@ -49,7 +50,8 @@ services:
     command: -config.file=/etc/promtail/config.yml
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.4
 
   monitoring-grafana-dashboard-server:
     image: grafana/grafana:latest
@@ -63,7 +65,8 @@ services:
       - ./monitoring-grafana-dashboard-server/provisioning:/etc/grafana/provisioning:ro
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.16
 
   redis-cache-server:
     image: redis:7-alpine
@@ -72,9 +75,11 @@ services:
       - "6379:6379"
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.6
 
   # --- Vân: App × 2 (LB) + Proxy ---
+  # Zone application-backend-server / app-backend → 172.20.0.11 (app-1)
   application-backend-server-1:
     build:
       context: ./application-backend-server
@@ -99,7 +104,8 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.11
 
   application-backend-server-2:
     build:
@@ -124,7 +130,8 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.18
 
   web-frontend-server:
     build:
@@ -143,7 +150,8 @@ services:
       - "8080:80"
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.10
 
   # ── Internal DNS Server (Bind9) ── Hân ──────────────────────────────────────
   internal-dns-server:
@@ -157,7 +165,8 @@ services:
       - "1053:53/tcp"
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.2
 
   # ── Lợi: Database (Postgres) + Auth (Keycloak) + MinIO (Object Storage) ────
   relational-database-server:
@@ -174,7 +183,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./relational-database-server/init:/docker-entrypoint-initdb.d:ro
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.12
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U minicloud -d minicloud"]
       interval: 5s
@@ -198,7 +208,8 @@ services:
       - keycloak_data:/opt/keycloak/data
       - ./authentication-identity-server/realm:/opt/keycloak/data/import:ro
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.13
 
   object-storage-server:
     image: minicloud-minio:source-RELEASE.2025-09-07T16-13-09Z
@@ -217,7 +228,8 @@ services:
     volumes:
       - ./object-storage-server/data:/data
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.14
 
   api-gateway-proxy-server:
     build:
@@ -234,7 +246,8 @@ services:
       - authentication-identity-server
     restart: unless-stopped
     networks:
-      - cloud-net
+      cloud-net:
+        ipv4_address: 172.20.0.17
 
 volumes:
   postgres_data:

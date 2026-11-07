@@ -26,6 +26,7 @@ export type Room = {
 @Injectable()
 export class AppService {
   private pool: Pool | null | undefined;
+  private studentDbPool: Pool | null | undefined;
 
   getHello() {
     return {
@@ -38,6 +39,43 @@ export class AppService {
     const filePath = join(process.cwd(), 'students.json');
     const raw = readFileSync(filePath, 'utf8');
     return JSON.parse(raw);
+  }
+
+  /** Đề mở rộng ③: đọc danh sách sinh viên từ database studentdb. */
+  async getStudentsDb() {
+    const pool = this.getStudentDbPool();
+    if (!pool) {
+      return { error: 'Database studentdb chưa cấu hình', students: [] };
+    }
+    const result = await pool.query(
+      'SELECT id, student_id, fullname, dob, major FROM students ORDER BY id',
+    );
+    return result.rows;
+  }
+
+  private getStudentDbPool(): Pool | null {
+    if (this.studentDbPool !== undefined) {
+      return this.studentDbPool;
+    }
+
+    const host = process.env.POSTGRES_HOST || process.env.DB_HOST;
+    if (!host) {
+      this.studentDbPool = null;
+      return this.studentDbPool;
+    }
+
+    this.studentDbPool = new Pool({
+      host,
+      port: Number(process.env.POSTGRES_PORT || process.env.DB_PORT || 5432),
+      user: process.env.POSTGRES_USER || process.env.DB_USER || 'minicloud',
+      password:
+        process.env.POSTGRES_PASSWORD ||
+        process.env.DB_PASSWORD ||
+        'minicloud_dev',
+      database: 'studentdb',
+    });
+
+    return this.studentDbPool;
   }
 
   async getRooms(): Promise<Room[]> {

@@ -1,21 +1,120 @@
-======================================================
-  MINICLOUD - Internal Network Connectivity Test
-  From: monitoring-prometheus-server
-  Date: 2026-11-01 15:41:53 UTC
-======================================================
+=== web-frontend-server ===
+PING web-frontend-server (172.20.0.10): 56 data bytes
+64 bytes from 172.20.0.10: seq=0 ttl=64 time=0.170 ms
+64 bytes from 172.20.0.10: seq=1 ttl=64 time=0.093 ms
+64 bytes from 172.20.0.10: seq=2 ttl=64 time=0.139 ms
 
-[PASS] monitoring-node-exporter-server:9100 -- Reachable (HTTP response received)
-[PASS] monitoring-grafana-dashboard-server:3000 -- Reachable (HTTP response received)
-[PASS] loki:3100 -- Reachable (connection established)
-[PASS] application-backend-server-1:8081 -- Reachable (connection established)
-[PASS] application-backend-server-2:8081 -- Reachable (connection established)
-[PASS] web-frontend-server:80 -- Reachable (HTTP response received)
-[PASS] api-gateway-proxy-server:80 -- Reachable (HTTP response received)
-[INFO] object-storage-server:9000 -- wget exit=1 (non-HTTP or blocked, but DNS resolved via ping earlier)
+--- web-frontend-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.093/0.134/0.170 ms
 
---- Non-HTTP services (DNS resolution confirmed via ping) ---
-[DNS-OK] promtail (172.18.0.12) -- Resolved, no HTTP endpoint
-[DNS-OK] redis-cache-server (172.18.0.11) -- Resolved, Redis protocol
-[DNS-OK] internal-dns-server (172.18.0.9) -- Resolved, DNS protocol
-[DNS-OK] relational-database-server (172.18.0.15) -- Resolved, PostgreSQL
-[DNS-OK] authentication-identity-server (172.18.0.4) -- Resolved, Keycloak
+=== web-frontend-server-2 ===
+PING web-frontend-server-2 (172.20.0.19): 56 data bytes
+64 bytes from 172.20.0.19: seq=0 ttl=64 time=0.092 ms
+64 bytes from 172.20.0.19: seq=1 ttl=64 time=0.241 ms
+64 bytes from 172.20.0.19: seq=2 ttl=64 time=0.071 ms
+
+--- web-frontend-server-2 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.071/0.134/0.241 ms
+
+=== application-backend-server-1 ===
+PING application-backend-server-1 (172.20.0.11): 56 data bytes
+64 bytes from 172.20.0.11: seq=0 ttl=64 time=0.135 ms
+64 bytes from 172.20.0.11: seq=1 ttl=64 time=0.084 ms
+64 bytes from 172.20.0.11: seq=2 ttl=64 time=0.084 ms
+
+--- application-backend-server-1 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.084/0.101/0.135 ms
+
+=== application-backend-server-2 ===
+PING application-backend-server-2 (172.20.0.18): 56 data bytes
+64 bytes from 172.20.0.18: seq=0 ttl=64 time=0.104 ms
+64 bytes from 172.20.0.18: seq=1 ttl=64 time=0.088 ms
+64 bytes from 172.20.0.18: seq=2 ttl=64 time=0.099 ms
+
+--- application-backend-server-2 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.088/0.097/0.104 ms
+
+=== relational-database-server ===
+PING relational-database-server (172.20.0.12): 56 data bytes
+64 bytes from 172.20.0.12: seq=0 ttl=64 time=1.143 ms
+64 bytes from 172.20.0.12: seq=1 ttl=64 time=0.169 ms
+64 bytes from 172.20.0.12: seq=2 ttl=64 time=0.133 ms
+
+--- relational-database-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.133/0.481/1.143 ms
+
+=== authentication-identity-server ===
+PING authentication-identity-server (172.20.0.13): 56 data bytes
+64 bytes from 172.20.0.13: seq=0 ttl=64 time=0.104 ms
+64 bytes from 172.20.0.13: seq=1 ttl=64 time=0.168 ms
+64 bytes from 172.20.0.13: seq=2 ttl=64 time=0.091 ms
+
+--- authentication-identity-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.091/0.121/0.168 ms
+
+=== object-storage-server ===
+PING object-storage-server (172.20.0.14): 56 data bytes
+64 bytes from 172.20.0.14: seq=0 ttl=64 time=0.184 ms
+64 bytes from 172.20.0.14: seq=1 ttl=64 time=0.117 ms
+64 bytes from 172.20.0.14: seq=2 ttl=64 time=0.125 ms
+
+--- object-storage-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.117/0.142/0.184 ms
+
+=== monitoring-prometheus-server ===
+PING monitoring-prometheus-server (172.20.0.15): 56 data bytes
+64 bytes from 172.20.0.15: seq=0 ttl=64 time=0.119 ms
+64 bytes from 172.20.0.15: seq=1 ttl=64 time=0.135 ms
+64 bytes from 172.20.0.15: seq=2 ttl=64 time=0.118 ms
+
+--- monitoring-prometheus-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.118/0.124/0.135 ms
+
+=== monitoring-grafana-dashboard-server ===
+PING monitoring-grafana-dashboard-server (172.20.0.16): 56 data bytes
+64 bytes from 172.20.0.16: seq=0 ttl=64 time=0.077 ms
+64 bytes from 172.20.0.16: seq=1 ttl=64 time=0.127 ms
+64 bytes from 172.20.0.16: seq=2 ttl=64 time=0.094 ms
+
+--- monitoring-grafana-dashboard-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.077/0.099/0.127 ms
+
+=== api-gateway-proxy-server ===
+PING api-gateway-proxy-server (172.20.0.17): 56 data bytes
+64 bytes from 172.20.0.17: seq=0 ttl=64 time=0.097 ms
+64 bytes from 172.20.0.17: seq=1 ttl=64 time=0.110 ms
+64 bytes from 172.20.0.17: seq=2 ttl=64 time=0.089 ms
+
+--- api-gateway-proxy-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.089/0.098/0.110 ms
+
+=== internal-dns-server ===
+PING internal-dns-server (172.20.0.2): 56 data bytes
+64 bytes from 172.20.0.2: seq=0 ttl=64 time=0.268 ms
+64 bytes from 172.20.0.2: seq=1 ttl=64 time=0.125 ms
+64 bytes from 172.20.0.2: seq=2 ttl=64 time=0.131 ms
+
+--- internal-dns-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.125/0.174/0.268 ms
+
+=== monitoring-node-exporter-server ===
+PING monitoring-node-exporter-server (172.20.0.3): 56 data bytes
+64 bytes from 172.20.0.3: seq=0 ttl=64 time=0.110 ms
+64 bytes from 172.20.0.3: seq=1 ttl=64 time=0.144 ms
+64 bytes from 172.20.0.3: seq=2 ttl=64 time=0.104 ms
+
+--- monitoring-node-exporter-server ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.104/0.119/0.144 ms
+

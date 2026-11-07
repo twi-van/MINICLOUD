@@ -31,6 +31,7 @@ internal-dns-server             IN  A   172.20.0.2
 monitoring-prometheus-server    IN  A   172.20.0.15
 monitoring-grafana-dashboard-server  IN  A   172.20.0.16
 api-gateway-proxy-server        IN  A   172.20.0.17
+monitoring-node-exporter-server  IN  A   172.20.0.3
 
 ; ── Mở rộng: tên ngắn tiện dùng ─────────────────────────────────────────────
 app-backend     IN  A   172.20.0.11

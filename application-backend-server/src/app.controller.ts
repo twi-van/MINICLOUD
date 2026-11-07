@@ -40,6 +40,12 @@ export class AppController {
     return this.appService.getStudent();
   }
 
+  /** Đề mở rộng ③: đọc danh sách sinh viên từ database studentdb. */
+  @Get('students-db')
+  getStudentsDb() {
+    return this.appService.getStudentsDb();
+  }
+
   @Get('rooms')
   getRooms() {
     return this.appService.getRooms();

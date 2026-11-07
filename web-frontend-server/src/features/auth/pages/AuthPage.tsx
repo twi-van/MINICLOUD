@@ -32,7 +32,8 @@ export default function AuthPage({ register = false }: { register?: boolean }) {
     try {
       if (register) await registerWithKeycloak(redirect)
       else await loginWithKeycloak(redirect)
-    } catch {
+    } catch (err) {
+      console.error('Keycloak redirect error:', err)
       message.error(
         register
           ? 'Không thể mở trang đăng ký. Vui lòng thử lại.'

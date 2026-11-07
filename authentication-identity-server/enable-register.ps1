@@ -5,26 +5,27 @@ $adminUser = if ($env:KC_BOOTSTRAP_ADMIN_USERNAME) { $env:KC_BOOTSTRAP_ADMIN_USE
 $adminPass = if ($env:KC_BOOTSTRAP_ADMIN_PASSWORD) { $env:KC_BOOTSTRAP_ADMIN_PASSWORD } else { 'admin' }
 $demoUser = if ($env:DEMO_USERNAME) { $env:DEMO_USERNAME } else { 'student_demo' }
 $demoPass = if ($env:DEMO_PASSWORD) { $env:DEMO_PASSWORD } else { '123456' }
+$realm = if ($env:KEYCLOAK_REALM) { $env:KEYCLOAK_REALM } else { 'realm_52400211' }
 
 Write-Host "Authenticating kcadm inside $container ..."
 & docker exec $container /opt/keycloak/bin/kcadm.sh config credentials `
-    --server http://localhost:8080 `
+    --server http://localhost:8080/auth `
     --realm master `
     --user $adminUser `
     --password $adminPass
 if ($LASTEXITCODE -ne 0) { throw "Failed to authenticate with Keycloak inside $container." }
 
-Write-Host "Enabling registrationAllowed=true on realm minicloud ..."
-& docker exec $container /opt/keycloak/bin/kcadm.sh update realms/minicloud `
+Write-Host "Enabling registrationAllowed=true on realm $realm ..."
+& docker exec $container /opt/keycloak/bin/kcadm.sh update realms/$realm `
     -s registrationAllowed=true `
     -s loginWithEmailAllowed=true `
     -s duplicateEmailsAllowed=false
-if ($LASTEXITCODE -ne 0) { throw "Failed to update realm minicloud." }
+if ($LASTEXITCODE -ne 0) { throw "Failed to update realm $realm." }
 
-$existing = & docker exec $container /opt/keycloak/bin/kcadm.sh get users -r minicloud -q "username=$demoUser"
+$existing = & docker exec $container /opt/keycloak/bin/kcadm.sh get users -r $realm -q "username=$demoUser"
 if ($existing -notmatch "`"username`"\s*:\s*`"$demoUser`"") {
     Write-Host "Creating demo user $demoUser ..."
-    & docker exec $container /opt/keycloak/bin/kcadm.sh create users -r minicloud `
+    & docker exec $container /opt/keycloak/bin/kcadm.sh create users -r $realm `
         -s "username=$demoUser" `
         -s "email=user@minicloud.local" `
         -s "firstName=Student" `
@@ -35,10 +36,10 @@ if ($existing -notmatch "`"username`"\s*:\s*`"$demoUser`"") {
 }
 
 Write-Host "Setting password for $demoUser ..."
-& docker exec $container /opt/keycloak/bin/kcadm.sh set-password -r minicloud `
+& docker exec $container /opt/keycloak/bin/kcadm.sh set-password -r $realm `
     --username $demoUser `
-    --new-password $demoPass
+    --new-password $demoPass `
+    --temporary=false
 if ($LASTEXITCODE -ne 0) { throw "Failed to set password for $demoUser." }
 
-Write-Host "Done. Realm minicloud now has registrationAllowed=true and demo user $demoUser."
-
+Write-Host "Done. Realm $realm now has registrationAllowed=true and demo user $demoUser."

@@ -11,7 +11,7 @@ export const config = {
         : 'mock',
   keycloak: {
     url: (import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost/auth').replace(/\/$/, ''),
-    realm: import.meta.env.VITE_KEYCLOAK_REALM || 'minicloud',
+    realm: import.meta.env.VITE_KEYCLOAK_REALM || 'realm_52400211',
     clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'web-frontend',
   },
 }

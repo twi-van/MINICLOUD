@@ -75,7 +75,7 @@ export class AppController {
       sub: user.sub,
       preferred_username: user.preferred_username,
       email: user.email,
-      realm: 'minicloud',
+      realm: 'realm_52400211',
     };
   }
 

@@ -3,11 +3,52 @@
   "enabled": true,
   "displayName": "Realm 52400211",
   "sslRequired": "none",
-  "registrationAllowed": false,
+  "registrationAllowed": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "student",
+        "description": "MiniCloud student"
+      }
+    ]
+  },
   "clients": [
+    {
+      "clientId": "web-frontend",
+      "name": "MyMiniCloud React Web",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "rootUrl": "http://localhost",
+      "baseUrl": "http://localhost/",
+      "redirectUris": [
+        "http://localhost/*",
+        "http://localhost:8080/*",
+        "http://localhost:5173/*",
+        "http://13.250.19.3/*",
+        "http://13.250.19.3:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost",
+        "http://localhost:8080",
+        "http://localhost:5173",
+        "http://13.250.19.3",
+        "http://13.250.19.3:8080"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      }
+    },
     {
       "clientId": "flask-app",
       "name": "Lab token client",
@@ -30,6 +71,22 @@
   ],
   "users": [
     {
+      "username": "student_demo",
+      "enabled": true,
+      "email": "student_demo@minicloud.local",
+      "emailVerified": true,
+      "firstName": "Student",
+      "lastName": "Demo",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123456",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"]
+    },
+    {
       "username": "sv01",
       "enabled": true,
       "email": "sv01@minicloud.local",
@@ -42,7 +99,8 @@
           "value": "123456",
           "temporary": false
         }
-      ]
+      ],
+      "realmRoles": ["student"]
     },
     {
       "username": "sv02",
@@ -57,7 +115,8 @@
           "value": "123456",
           "temporary": false
         }
-      ]
+      ],
+      "realmRoles": ["student"]
     }
   ]
 }

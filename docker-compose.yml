@@ -101,8 +101,8 @@ services:
       - POSTGRES_PASSWORD=minicloud_dev
       - POSTGRES_DB=minicloud
       # A3 JWT — issuer = URL public token; JWKS = Keycloak trong cloud-net
-      - KEYCLOAK_ISSUER=http://localhost/auth/realms/minicloud
-      - KEYCLOAK_JWKS_URI=http://authentication-identity-server:8080/auth/realms/minicloud/protocol/openid-connect/certs
+      - KEYCLOAK_ISSUER=http://localhost/auth/realms/realm_52400211
+      - KEYCLOAK_JWKS_URI=http://authentication-identity-server:8080/auth/realms/realm_52400211/protocol/openid-connect/certs
       - KEYCLOAK_LAB_ISSUER=http://localhost/auth/realms/realm_52400211
       - KEYCLOAK_LAB_JWKS_URI=http://authentication-identity-server:8080/auth/realms/realm_52400211/protocol/openid-connect/certs
     depends_on:
@@ -129,8 +129,8 @@ services:
       - POSTGRES_USER=minicloud
       - POSTGRES_PASSWORD=minicloud_dev
       - POSTGRES_DB=minicloud
-      - KEYCLOAK_ISSUER=http://localhost/auth/realms/minicloud
-      - KEYCLOAK_JWKS_URI=http://authentication-identity-server:8080/auth/realms/minicloud/protocol/openid-connect/certs
+      - KEYCLOAK_ISSUER=http://localhost/auth/realms/realm_52400211
+      - KEYCLOAK_JWKS_URI=http://authentication-identity-server:8080/auth/realms/realm_52400211/protocol/openid-connect/certs
       - KEYCLOAK_LAB_ISSUER=http://localhost/auth/realms/realm_52400211
       - KEYCLOAK_LAB_JWKS_URI=http://authentication-identity-server:8080/auth/realms/realm_52400211/protocol/openid-connect/certs
     depends_on:
@@ -150,7 +150,7 @@ services:
         VITE_API_BASE_URL: /api
         VITE_AUTH_MODE: keycloak
         VITE_KEYCLOAK_URL: http://localhost/auth
-        VITE_KEYCLOAK_REALM: minicloud
+        VITE_KEYCLOAK_REALM: realm_52400211
         VITE_KEYCLOAK_CLIENT_ID: web-frontend
     image: myminicloud-web:v1
     container_name: web-frontend-server

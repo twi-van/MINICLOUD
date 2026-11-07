@@ -10,11 +10,11 @@ import { createRemoteJWKSet, jwtVerify } from 'jose';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   private readonly issuer =
-    process.env.KEYCLOAK_ISSUER ?? 'http://localhost/auth/realms/minicloud';
+    process.env.KEYCLOAK_ISSUER ?? 'http://localhost/auth/realms/realm_52400211';
 
   private readonly jwksUri =
     process.env.KEYCLOAK_JWKS_URI ??
-    'http://authentication-identity-server:8080/auth/realms/minicloud/protocol/openid-connect/certs';
+    'http://authentication-identity-server:8080/auth/realms/realm_52400211/protocol/openid-connect/certs';
 
   private jwks = createRemoteJWKSet(new URL(this.jwksUri));
 

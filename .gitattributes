@@ -1,0 +1,4 @@
+# Enforce LF for shell scripts and metrics files to prevent CRLF parsing errors
+*.sh text eol=lf
+*.txt text eol=lf
+metrics.txt text eol=lf

@@ -105,15 +105,20 @@ export default function RoomDetailPage() {
       </div>
       <Image.PreviewGroup>
         <div className={`detail-gallery ${images.length > 1 ? 'has-grid' : ''}`}>
-          {images.map((src, index) => (
-            <Image
-              key={`${src}-${index}`}
-              src={resolveRoomImage(src)}
-              alt={`${room.title} — ảnh ${index + 1}`}
-              className="!h-full !w-full !object-cover"
-              fallback="/images/room-placeholder.svg"
-            />
-          ))}
+          {images.map((src, index) => {
+            const resolved = resolveRoomImage(src)
+            const match = resolved.match(/room-\d+\.jpg/)
+            const fallback = match ? `/images/${match[0]}` : '/images/room-placeholder.svg'
+            return (
+              <Image
+                key={`${src}-${index}`}
+                src={resolved}
+                alt={`${room.title} — ảnh ${index + 1}`}
+                className="!h-full !w-full !object-cover"
+                fallback={fallback}
+              />
+            )
+          })}
         </div>
       </Image.PreviewGroup>
       <div className="grid items-start gap-10 py-9 lg:grid-cols-[1fr_350px]">

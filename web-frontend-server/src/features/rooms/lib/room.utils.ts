@@ -23,19 +23,39 @@ export const roomDistrict = (room: Room) =>
  * host-facing MinIO URL, while the gateway exposes the same objects at
  * `/minio/` so browsers do not need a second origin or CORS configuration.
  */
-export function resolveRoomImage(src: string) {
+export function resolveRoomImage(src: string): string {
+  if (!src) return '/images/room-placeholder.svg'
   try {
-    const url = new URL(src, window.location.origin)
+    if (src.startsWith('/minio/') || src.startsWith('/images/')) {
+      return src
+    }
+
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
+    const url = new URL(src, origin)
+
+    // Any URL on port 9000 (MinIO direct port) -> proxy through /minio
+    if (url.port === '9000') {
+      return `/minio${url.pathname}${url.search}`
+    }
+
+    // Any URL pointing to /rooms-images/ -> route to /minio/rooms-images/...
+    if (url.pathname.includes('/rooms-images/')) {
+      const parts = url.pathname.split('/rooms-images/')
+      return `/minio/rooms-images/${parts[parts.length - 1]}`
+    }
+
     if (
-      (url.hostname === 'localhost' ||
-        url.hostname === '127.0.0.1' ||
-        url.hostname === 'object-storage-server') &&
-      url.port === '9000'
+      url.hostname === 'localhost' ||
+      url.hostname === '127.0.0.1' ||
+      url.hostname === 'object-storage-server'
     ) {
       return `/minio${url.pathname}${url.search}`
     }
   } catch {
-    // Keep malformed/relative values unchanged; SafeImage will show a fallback.
+    const match = src.match(/room-\d+\.jpg/)
+    if (match) {
+      return `/minio/rooms-images/${match[0]}`
+    }
   }
   return src
 }

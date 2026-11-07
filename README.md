@@ -93,6 +93,7 @@ docker compose up -d --build \
 
 curl http://localhost/api/hello
 curl http://localhost/api/student
+curl http://localhost/api/students-db
 curl http://localhost/student/
 curl http://localhost/api/rooms
 
@@ -127,6 +128,7 @@ docker compose down
 # Qua proxy — dùng http://localhost/ (không dùng localhost.cloud)
 curl http://localhost/api/hello
 curl http://localhost/api/student
+curl http://localhost/api/students-db
 curl http://localhost/student/
 curl http://localhost/api/rooms
 curl -I http://localhost/
@@ -151,7 +153,7 @@ dig @127.0.0.1 -p 1053 keycloak.cloud.local +short
 - Grafana: http://localhost:3000 — dashboard `System Health of 52400102`  
 - MinIO Console: http://localhost:9001  
 - PDF MinIO: http://localhost:9000/documents/bao-cao.pdf  
-- Database đề: `studentdb.students` (`student_id`, `fullname`, `dob`, `major`). App `/student` vẫn đọc `students.json`.
+- Database đề: `studentdb.students` (`student_id`, `fullname`, `dob`, `major`). App `/student` đọc `students.json`; `/api/students-db` đọc Postgres `studentdb`.
 
 ## Phân công mở rộng / E2E (tóm tắt)
 

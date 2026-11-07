@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AppService } from './app.service';
+import { LabJwtAuthGuard } from './auth/lab-jwt-auth.guard';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { MetricsService } from './metrics.service';
 
@@ -47,6 +48,17 @@ export class AppController {
   @Get('rooms/:id')
   getRoomById(@Param('id', ParseIntPipe) id: number) {
     return this.appService.getRoomById(id);
+  }
+
+  /** Đề: Bearer token từ realm MSSV + client flask-app. */
+  @Get('secure')
+  @UseGuards(LabJwtAuthGuard)
+  getSecure(@Req() req: { user?: Record<string, unknown> }) {
+    const user = req.user ?? {};
+    return {
+      message: 'Secure resource OK',
+      preferred_username: user.preferred_username,
+    };
   }
 
   @Get('me')

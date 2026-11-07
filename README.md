@@ -55,7 +55,7 @@ cloud/
 | ------- | --------- |
 | Proxy (API Gateway) | 80 |
 | Web | 8080 |
-| Auth (Keycloak) | 8082 |
+| Auth (Keycloak) | 8081 |
 | App API (instance 1 / 2) | 8085 / 8086 (container 8081) |
 | Grafana | 3000 |
 | MinIO API / Console | 9000 / 9001 |
@@ -96,9 +96,13 @@ curl http://localhost/api/student
 curl http://localhost/student/
 curl http://localhost/api/rooms
 
-# LB: gọi vài lần — instance xen kẽ app-1 / app-2
+# LB app: xen kẽ app-1 / app-2
 curl -s http://localhost/api/hello; echo
 curl -s http://localhost/api/hello; echo
+
+# LB web (đề): xen kẽ web-frontend-server-1 / web-frontend-server-2
+curl -s http://localhost/lb-demo
+curl -s http://localhost/lb-demo
 ```
 
 Chạy cả stack (khi đã merge đủ service):
@@ -141,7 +145,7 @@ dig @127.0.0.1 -p 1053 keycloak.cloud.local +short
 
 - App / Login: http://localhost/ · http://localhost/login  
 - Blog tĩnh theo đề: http://localhost/blog/blog1.html · blog2.html · blog3.html  
-- Keycloak admin: http://localhost:8082/auth/admin/master/console/  
+- Keycloak admin: http://localhost:8081/auth/admin/master/console/  
 - Keycloak qua proxy: http://localhost/auth/  
 - Prometheus: http://localhost:9090 → Status → Targets (có job `web`)  
 - Grafana: http://localhost:3000 — dashboard `System Health of 52400102`  

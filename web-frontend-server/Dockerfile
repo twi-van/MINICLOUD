@@ -22,6 +22,7 @@ FROM nginx:1.28-alpine
 ENV BACKEND_UPSTREAM=application-backend-server-1:8081
 ENV AUTH_UPSTREAM=authentication-identity-server:8080
 ENV MINIO_UPSTREAM=object-storage-server:9000
+ENV WEB_INSTANCE=web-frontend-server-1
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80

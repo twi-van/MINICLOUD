@@ -99,6 +99,8 @@ services:
       # A3 JWT — issuer = URL public token; JWKS = Keycloak trong cloud-net
       - KEYCLOAK_ISSUER=http://localhost/auth/realms/minicloud
       - KEYCLOAK_JWKS_URI=http://authentication-identity-server:8080/auth/realms/minicloud/protocol/openid-connect/certs
+      - KEYCLOAK_LAB_ISSUER=http://localhost/auth/realms/realm_52400211
+      - KEYCLOAK_LAB_JWKS_URI=http://authentication-identity-server:8080/auth/realms/realm_52400211/protocol/openid-connect/certs
     depends_on:
       relational-database-server:
         condition: service_healthy
@@ -125,6 +127,8 @@ services:
       - POSTGRES_DB=minicloud
       - KEYCLOAK_ISSUER=http://localhost/auth/realms/minicloud
       - KEYCLOAK_JWKS_URI=http://authentication-identity-server:8080/auth/realms/minicloud/protocol/openid-connect/certs
+      - KEYCLOAK_LAB_ISSUER=http://localhost/auth/realms/realm_52400211
+      - KEYCLOAK_LAB_JWKS_URI=http://authentication-identity-server:8080/auth/realms/realm_52400211/protocol/openid-connect/certs
     depends_on:
       relational-database-server:
         condition: service_healthy
@@ -146,12 +150,26 @@ services:
         VITE_KEYCLOAK_CLIENT_ID: web-frontend
     image: myminicloud-web:v1
     container_name: web-frontend-server
+    environment:
+      - WEB_INSTANCE=web-frontend-server-1
     ports:
       - "8080:80"
     restart: unless-stopped
     networks:
       cloud-net:
         ipv4_address: 172.20.0.10
+
+  web-frontend-server-2:
+    image: myminicloud-web:v1
+    container_name: web-frontend-server-2
+    environment:
+      - WEB_INSTANCE=web-frontend-server-2
+    ports:
+      - "8083:80"
+    restart: unless-stopped
+    networks:
+      cloud-net:
+        ipv4_address: 172.20.0.19
 
   # ── Internal DNS Server (Bind9) ── Hân ──────────────────────────────────────
   internal-dns-server:
@@ -200,10 +218,10 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME: ${KEYCLOAK_PUBLIC_URL:-http://localhost/auth}
-      KC_HOSTNAME_ADMIN: ${KEYCLOAK_ADMIN_URL:-http://localhost:8082/auth}
+      KC_HOSTNAME_ADMIN: ${KEYCLOAK_ADMIN_URL:-http://localhost:8081/auth}
       KC_PROXY_HEADERS: xforwarded
     ports:
-      - "8082:8080"
+      - "8081:8080"
     volumes:
       - keycloak_data:/opt/keycloak/data
       - ./authentication-identity-server/realm:/opt/keycloak/data/import:ro
@@ -243,6 +261,7 @@ services:
       - application-backend-server-1
       - application-backend-server-2
       - web-frontend-server
+      - web-frontend-server-2
       - authentication-identity-server
     restart: unless-stopped
     networks:

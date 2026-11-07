@@ -11,8 +11,17 @@ server {
         alias /usr/share/nginx/html/metrics.txt;
     }
 
+    # Đề: Round Robin 2 trang web. Mỗi container một WEB_INSTANCE.
+    location = /lb-demo {
+        default_type text/html;
+        add_header Cache-Control "no-store";
+        add_header X-Web-Server "${WEB_INSTANCE}";
+        return 200 '<!doctype html><html lang="vi"><meta charset="utf-8"><title>${WEB_INSTANCE}</title><body><h1>${WEB_INSTANCE}</h1><p>Round Robin web server</p><a href="/">Về trang chủ</a></body></html>';
+    }
+
     # Keep all React deep links refreshable, including /blog/ and /rooms/:id.
     location / {
+        add_header X-Web-Server "${WEB_INSTANCE}";
         try_files $uri $uri/ /index.html;
     }
 

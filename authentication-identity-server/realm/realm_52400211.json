@@ -1,0 +1,63 @@
+{
+  "realm": "realm_52400211",
+  "enabled": true,
+  "displayName": "Realm 52400211",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "clients": [
+    {
+      "clientId": "flask-app",
+      "name": "Lab token client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost/*",
+        "http://13.250.19.3/*"
+      ],
+      "webOrigins": [
+        "http://localhost",
+        "http://13.250.19.3"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "sv01",
+      "enabled": true,
+      "email": "sv01@minicloud.local",
+      "emailVerified": true,
+      "firstName": "Sinh",
+      "lastName": "Vien 01",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123456",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "sv02",
+      "enabled": true,
+      "email": "sv02@minicloud.local",
+      "emailVerified": true,
+      "firstName": "Sinh",
+      "lastName": "Vien 02",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123456",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

@@ -14,7 +14,7 @@ export class JwtAuthGuard implements CanActivate {
 
   private readonly jwksUri =
     process.env.KEYCLOAK_JWKS_URI ??
-    'http://authentication-identity-server:8080/realms/minicloud/protocol/openid-connect/certs';
+    'http://authentication-identity-server:8080/auth/realms/minicloud/protocol/openid-connect/certs';
 
   private jwks = createRemoteJWKSet(new URL(this.jwksUri));
 

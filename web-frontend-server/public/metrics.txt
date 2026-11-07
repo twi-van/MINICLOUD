@@ -1,0 +1,3 @@
+# HELP web_up Web frontend server is up.
+# TYPE web_up gauge
+web_up 1

@@ -2,6 +2,7 @@ $ErrorActionPreference = 'Stop'
 
 $bucket = if ($env:MINIO_BUCKET) { $env:MINIO_BUCKET } else { 'rooms-images' }
 $avatarBucket = if ($env:MINIO_AVATAR_BUCKET) { $env:MINIO_AVATAR_BUCKET } else { 'profile-pics' }
+$docsBucket = if ($env:MINIO_DOCS_BUCKET) { $env:MINIO_DOCS_BUCKET } else { 'documents' }
 $endpoint = if ($env:MINIO_ENDPOINT) { $env:MINIO_ENDPOINT } else { 'http://localhost:9000' }
 $publicBaseUrl = if ($env:PUBLIC_MINIO_BASE_URL) { $env:PUBLIC_MINIO_BASE_URL } else { $endpoint }
 $accessKey = if ($env:MINIO_ROOT_USER) { $env:MINIO_ROOT_USER } else { 'minioadmin' }
@@ -22,7 +23,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 $existingBuckets = $bucketList -split '\s+'
 
-foreach ($b in @($bucket, $avatarBucket)) {
+foreach ($b in @($bucket, $avatarBucket, $docsBucket)) {
     if ($existingBuckets -notcontains $b) {
         & aws s3api create-bucket --bucket $b --endpoint-url $endpoint | Out-Null
         if ($LASTEXITCODE -ne 0) { throw "Could not create bucket $b." }
@@ -46,7 +47,27 @@ $avatarFile = Join-Path $PSScriptRoot 'seed/avatar-demo.jpg'
 if (Test-Path -LiteralPath $avatarFile) {
     & aws s3 cp $avatarFile "s3://$avatarBucket/avatar-demo.jpg" --content-type image/jpeg --endpoint-url $endpoint
     if ($LASTEXITCODE -ne 0) { throw "Could not upload avatar-demo.jpg." }
+    & aws s3 cp $avatarFile "s3://$avatarBucket/avatar.jpg" --content-type image/jpeg --endpoint-url $endpoint
+    if ($LASTEXITCODE -ne 0) { throw "Could not upload avatar.jpg." }
 }
+
+$pdfFile = Join-Path ([System.IO.Path]::GetTempPath()) 'minicloud-bao-cao.pdf'
+@'
+%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 144]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj
+4 0 obj<</Length 57>>stream
+BT /F1 18 Tf 36 90 Td (MyMiniCloud report) Tj ET
+endstream
+endobj
+5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj
+trailer<</Size 6/Root 1 0 R>>
+%%EOF
+'@ | Set-Content -LiteralPath $pdfFile -Encoding ascii
+& aws s3 cp $pdfFile "s3://$docsBucket/bao-cao.pdf" --content-type application/pdf --endpoint-url $endpoint
+Remove-Item -LiteralPath $pdfFile -Force -ErrorAction SilentlyContinue
+if ($LASTEXITCODE -ne 0) { throw "Could not upload bao-cao.pdf." }
 
 if (Test-Path -LiteralPath $migrationFile) {
     & docker cp $migrationFile relational-database-server:/tmp/004_parity_rooms_bookings.sql

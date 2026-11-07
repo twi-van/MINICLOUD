@@ -33,17 +33,74 @@
       "redirectUris": [
         "http://localhost/*",
         "http://localhost:8080/*",
-        "http://localhost:5173/*"
+        "http://localhost:5173/*",
+        "http://13.250.19.3/*",
+        "http://13.250.19.3:8080/*"
       ],
       "webOrigins": [
         "http://localhost",
         "http://localhost:8080",
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "http://13.250.19.3",
+        "http://13.250.19.3:8080"
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "+"
       }
+    },
+    {
+      "clientId": "flask-app",
+      "name": "Lab token client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost/*",
+        "http://13.250.19.3/*"
+      ],
+      "webOrigins": [
+        "http://localhost",
+        "http://13.250.19.3"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "sv01",
+      "enabled": true,
+      "email": "sv01@minicloud.local",
+      "emailVerified": true,
+      "firstName": "Sinh",
+      "lastName": "Vien 01",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123456",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"]
+    },
+    {
+      "username": "sv02",
+      "enabled": true,
+      "email": "sv02@minicloud.local",
+      "emailVerified": true,
+      "firstName": "Sinh",
+      "lastName": "Vien 02",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123456",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["student"]
     }
   ]
 }

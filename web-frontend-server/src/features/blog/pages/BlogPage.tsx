@@ -21,6 +21,13 @@ export default function BlogPage() {
           Ở hay hơn, <span>sống vui hơn.</span>
         </h1>
         <p>Những câu chuyện và kinh nghiệm nhỏ, cùng bạn trên hành trình tự lập.</p>
+        <p className="mt-3 text-sm">
+          <a href="/blog/blog1.html">Bài 1</a>
+          {' · '}
+          <a href="/blog/blog2.html">Bài 2</a>
+          {' · '}
+          <a href="/blog/blog3.html">Bài 3</a>
+        </p>
       </div>
       <div className="blog-toolbar mb-7 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-2">

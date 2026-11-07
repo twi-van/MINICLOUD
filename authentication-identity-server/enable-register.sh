@@ -22,21 +22,50 @@ docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh update realms/minicloud \
   -s loginWithEmailAllowed=true \
   -s duplicateEmailsAllowed=false
 
-if ! docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh get users -r minicloud -q "username=$DEMO_USER" | grep -q "\"username\" : \"$DEMO_USER\""; then
-  echo "Creating demo user $DEMO_USER ..."
-  docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh create users -r minicloud \
-    -s "username=$DEMO_USER" \
-    -s "email=user@minicloud.local" \
-    -s "firstName=Student" \
-    -s "lastName=Demo" \
-    -s enabled=true \
-    -s emailVerified=true
+ensure_user() {
+  local username="$1"
+  local email="$2"
+  local first="$3"
+  local last="$4"
+  local password="$5"
+  if ! docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh get users -r minicloud -q "username=$username" --fields username --format csv --noquotes | grep -qx "$username"; then
+    echo "Creating user $username ..."
+    docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh create users -r minicloud \
+      -s "username=$username" \
+      -s "email=$email" \
+      -s "firstName=$first" \
+      -s "lastName=$last" \
+      -s enabled=true \
+      -s emailVerified=true
+  else
+    echo "User $username already exists."
+  fi
+  docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh set-password -r minicloud \
+    --username "$username" \
+    --new-password "$password"
+}
+
+ensure_user "$DEMO_USER" "user@minicloud.local" "Student" "Demo" "$DEMO_PASS"
+ensure_user "sv01" "sv01@minicloud.local" "Sinh" "Vien 01" "123456"
+ensure_user "sv02" "sv02@minicloud.local" "Sinh" "Vien 02" "123456"
+
+if ! docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh get clients -r minicloud -q clientId=flask-app --fields clientId --format csv --noquotes | grep -qx "flask-app"; then
+  echo "Creating public client flask-app ..."
+  docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh create clients -r minicloud \
+    -s clientId=flask-app \
+    -s name="Lab token client" \
+    -s publicClient=true \
+    -s standardFlowEnabled=true \
+    -s directAccessGrantsEnabled=true \
+    -s 'redirectUris=["http://localhost/*","http://13.250.19.3/*"]' \
+    -s 'webOrigins=["http://localhost","http://13.250.19.3"]'
 fi
 
-echo "Setting password for $DEMO_USER ..."
-docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh set-password -r minicloud \
-  --username "$DEMO_USER" \
-  --new-password "$DEMO_PASS"
+CLIENT_UUID="$(docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh get clients -r minicloud -q clientId=web-frontend --fields id --format csv --noquotes | tail -n 1)"
+echo "Updating web-frontend redirect URIs ($CLIENT_UUID) ..."
+docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh update "clients/$CLIENT_UUID" -r minicloud \
+  -s 'redirectUris=["http://localhost/*","http://localhost:8080/*","http://localhost:5173/*","http://13.250.19.3/*","http://13.250.19.3:8080/*"]' \
+  -s 'webOrigins=["http://localhost","http://localhost:8080","http://localhost:5173","http://13.250.19.3","http://13.250.19.3:8080"]'
 
-echo "Done. Realm minicloud now has registrationAllowed=true and demo user $DEMO_USER."
+echo "Done. Realm minicloud allows registration, users student_demo/sv01/sv02, client flask-app, and EC2 redirect URIs."
 

@@ -71,7 +71,8 @@ cloud/
 | Keycloak | admin | admin |
 | Grafana | admin | admin |
 | MinIO | minioadmin | minioadmin |
-| PostgreSQL | *(theo compose / `.env`)* | *(theo compose / `.env`)* |
+| PostgreSQL | minicloud | minicloud_dev |
+| Keycloak sinh viên | sv01, sv02, student_demo | 123456 |
 
 ## Chạy local
 
@@ -92,6 +93,7 @@ docker compose up -d --build \
 
 curl http://localhost/api/hello
 curl http://localhost/api/student
+curl http://localhost/student/
 curl http://localhost/api/rooms
 
 # LB: gọi vài lần — instance xen kẽ app-1 / app-2
@@ -105,7 +107,7 @@ Chạy cả stack (khi đã merge đủ service):
 docker compose up -d --build
 docker compose ps
 
-# Ảnh phòng MinIO (nếu Object Browser trống)
+# Ảnh phòng, avatar và PDF bucket documents (script tự tạo PDF, không có file PDF trong git)
 bash object-storage-server/seed-rooms.sh
 ```
 
@@ -121,9 +123,12 @@ docker compose down
 # Qua proxy — dùng http://localhost/ (không dùng localhost.cloud)
 curl http://localhost/api/hello
 curl http://localhost/api/student
+curl http://localhost/student/
 curl http://localhost/api/rooms
 curl -I http://localhost/
 curl -I http://localhost/auth/
+curl -I http://localhost/blog/blog1.html
+curl -I http://localhost:8080/metrics
 
 # Web / App trực tiếp
 curl -I http://localhost:8080/
@@ -135,11 +140,14 @@ dig @127.0.0.1 -p 1053 keycloak.cloud.local +short
 ```
 
 - App / Login: http://localhost/ · http://localhost/login  
-- Keycloak (admin trực tiếp): http://localhost:8082  
+- Blog tĩnh theo đề: http://localhost/blog/blog1.html · blog2.html · blog3.html  
+- Keycloak admin: http://localhost:8082/auth/admin/master/console/  
 - Keycloak qua proxy: http://localhost/auth/  
-- Prometheus: http://localhost:9090 → Status → Targets  
-- Grafana: http://localhost:3000  
+- Prometheus: http://localhost:9090 → Status → Targets (có job `web`)  
+- Grafana: http://localhost:3000 — dashboard `System Health of 52400102`  
 - MinIO Console: http://localhost:9001  
+- PDF MinIO: http://localhost:9000/documents/bao-cao.pdf  
+- Database đề: `studentdb.students` (`student_id`, `fullname`, `dob`, `major`). App `/student` vẫn đọc `students.json`.
 
 ## Phân công mở rộng / E2E (tóm tắt)
 

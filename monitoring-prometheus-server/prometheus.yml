@@ -22,7 +22,13 @@ scrape_configs:
     static_configs:
       - targets: ['loki:3100']
 
-  # 5. Giam sat Application Backend (NestJS)
+  # 5. Giam sat Web Frontend (Nginx /metrics)
+  - job_name: 'web'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['web-frontend-server:80']
+
+  # 6. Giam sat Application Backend (NestJS)
   - job_name: 'application-backend'
     metrics_path: '/metrics'
     static_configs:

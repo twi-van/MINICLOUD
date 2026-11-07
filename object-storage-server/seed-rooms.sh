@@ -8,6 +8,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 BUCKET="${MINIO_BUCKET:-rooms-images}"
 AVATAR_BUCKET="${MINIO_AVATAR_BUCKET:-profile-pics}"
+DOCS_BUCKET="${MINIO_DOCS_BUCKET:-documents}"
 ENDPOINT="${MINIO_ENDPOINT:-http://localhost:9000}"
 # A4: mặc định URL public qua proxy :80/minio (API seed vẫn dùng ENDPOINT :9000)
 PUBLIC_BASE_URL="${PUBLIC_MINIO_BASE_URL:-http://localhost/minio}"
@@ -46,6 +47,7 @@ EOF
 
 ensure_public_bucket "$BUCKET"
 ensure_public_bucket "$AVATAR_BUCKET"
+ensure_public_bucket "$DOCS_BUCKET"
 
 for key in room-1.jpg room-2.jpg room-3.jpg room-4.jpg room-5.jpg room-6.jpg; do
   file="$ROOT/seed/$key"
@@ -61,7 +63,27 @@ AVATAR_FILE="$ROOT/seed/avatar-demo.jpg"
 if [[ -f "$AVATAR_FILE" ]]; then
   echo "Uploading avatar-demo.jpg to s3://$AVATAR_BUCKET/avatar-demo.jpg ..."
   aws s3 cp "$AVATAR_FILE" "s3://$AVATAR_BUCKET/avatar-demo.jpg" --content-type image/jpeg --endpoint-url "$ENDPOINT"
+  echo "Uploading avatar.jpg to s3://$AVATAR_BUCKET/avatar.jpg ..."
+  aws s3 cp "$AVATAR_FILE" "s3://$AVATAR_BUCKET/avatar.jpg" --content-type image/jpeg --endpoint-url "$ENDPOINT"
 fi
+
+PDF_FILE="$(mktemp "${TMPDIR:-/tmp}/minicloud-bao-cao.XXXXXX.pdf")"
+cat > "$PDF_FILE" <<'PDF'
+%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 144]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj
+4 0 obj<</Length 57>>stream
+BT /F1 18 Tf 36 90 Td (MyMiniCloud report) Tj ET
+endstream
+endobj
+5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj
+trailer<</Size 6/Root 1 0 R>>
+%%EOF
+PDF
+echo "Uploading bao-cao.pdf to s3://$DOCS_BUCKET/bao-cao.pdf ..."
+aws s3 cp "$PDF_FILE" "s3://$DOCS_BUCKET/bao-cao.pdf" --content-type application/pdf --endpoint-url "$ENDPOINT"
+rm -f "$PDF_FILE"
 
 echo "Applying parity schema & 8-room seed to Postgres ..."
 if [[ -f "$MIGRATION_FILE" ]]; then
@@ -79,4 +101,6 @@ fi
 echo "Done."
 echo "  Room images:  $PUBLIC_BASE_URL/$BUCKET/room-1.jpg .. room-6.jpg"
 echo "  Demo avatar:  $PUBLIC_BASE_URL/$AVATAR_BUCKET/avatar-demo.jpg"
+echo "  Lab avatar:   $PUBLIC_BASE_URL/$AVATAR_BUCKET/avatar.jpg"
+echo "  Report PDF:   $PUBLIC_BASE_URL/$DOCS_BUCKET/bao-cao.pdf"
 echo "Check: curl -s http://localhost/api/rooms | head"

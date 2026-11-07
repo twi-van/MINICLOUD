@@ -24,6 +24,8 @@ Run the seed script after `object-storage-server` and `relational-database-serve
 What the seed script does:
 1. Creates bucket `rooms-images` with public read policy (`s3:GetObject`) and uploads `room-1.jpg` .. `room-6.jpg`.
    - Public URLs: `http://localhost:9000/rooms-images/room-1.jpg` .. `http://localhost:9000/rooms-images/room-6.jpg`
-2. Creates bucket `profile-pics` (A6 parity) with public read policy (`s3:GetObject`) and uploads `avatar-demo.jpg`.
+2. Creates bucket `profile-pics` (A6 parity) with public read policy (`s3:GetObject`) and uploads `avatar-demo.jpg` plus `avatar.jpg`.
    - Public URL: `http://localhost:9000/profile-pics/avatar-demo.jpg`
-3. Applies `relational-database-server/init/004_parity_rooms_bookings.sql` so PostgreSQL has all 8 rooms with filter fields (`district`, `type`, `amenities`, `available`, `images`), the `bookings` table (A2), and `users.avatar_url`.
+3. Creates bucket `documents` and uploads a small PDF generated at runtime (`bao-cao.pdf` is not stored in git).
+   - Public URL: `http://localhost:9000/documents/bao-cao.pdf`
+4. Applies `relational-database-server/init/004_parity_rooms_bookings.sql` so PostgreSQL has all 8 rooms with filter fields (`district`, `type`, `amenities`, `available`, `images`), the `bookings` table (A2), and `users.avatar_url`.

@@ -59,7 +59,11 @@ export function initializeKeycloak(): Promise<void> {
   if (config.authMode !== 'keycloak') return Promise.resolve()
   if (initialization) return initialization
 
-  const active = new Keycloak(config.keycloak)
+  const active = new Keycloak({
+    url: config.keycloak.url,
+    realm: config.keycloak.realm,
+    clientId: config.keycloak.clientId,
+  })
   client = active
   active.onAuthSuccess = () => publish()
   active.onAuthRefreshSuccess = () => publish()

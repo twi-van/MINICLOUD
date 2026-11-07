@@ -38,7 +38,11 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const { payload } = await jwtVerify(token, this.jwks, {
-        issuer: this.issuer,
+        issuer: [
+          this.issuer,
+          'http://localhost/auth/realms/realm_52400211',
+          'http://13.250.19.3/auth/realms/realm_52400211',
+        ],
       });
       // Gắn payload vào request để controller lấy sub / preferred_username
       request.user = payload as Record<string, unknown>;

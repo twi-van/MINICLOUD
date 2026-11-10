@@ -34,6 +34,7 @@ api-gateway-proxy-server        IN  A   172.20.0.17
 monitoring-node-exporter-server  IN  A   172.20.0.3
 
 ; ── Mở rộng: tên ngắn tiện dùng ─────────────────────────────────────────────
+node-exporter   IN  A   172.20.0.3
 app-backend     IN  A   172.20.0.11
 minio           IN  A   172.20.0.14
 keycloak        IN  A   172.20.0.13

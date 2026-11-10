@@ -17,8 +17,12 @@ docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh config credentials \
   --user "$ADMIN_USER" \
   --password "$ADMIN_PASS"
 
+echo "Allowing HTTP access (sslRequired=NONE) on master and $REALM ..."
+docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh update realms/master -s sslRequired=NONE
+
 echo "Enabling registrationAllowed=true on realm $REALM ..."
 docker exec "$CONTAINER" /opt/keycloak/bin/kcadm.sh update realms/"$REALM" \
+  -s sslRequired=NONE \
   -s registrationAllowed=true \
   -s loginWithEmailAllowed=true \
   -s duplicateEmailsAllowed=false

@@ -184,7 +184,7 @@ dig @127.0.0.1 -p 1053 keycloak.cloud.local +short
 
 ## Link nộp
 
-- **Docker Hub:** [baomache/myminicloud-prometheus:v1](https://hub.docker.com/repository/docker/baomache/myminicloud-prometheus/tags)
+- **Docker Hub:** https://hub.docker.com/r/baomache/myminicloud-prometheus/tags
 - **AWS EC2:** http://13.250.19.3/ · http://13.250.19.3/api/hello · IP `13.250.19.3`
 - **Video demo:** https://www.youtube.com/watch?v=tWb67Kxjprg
 

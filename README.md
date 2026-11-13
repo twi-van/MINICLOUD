@@ -15,8 +15,6 @@ Mô phỏng hạ tầng cloud thu nhỏ (**9 loại server**) bằng Docker, m�
 | Bảo    | Prometheus + Grafana + Loki/Promtail + EC2 + Docker Hub + video + ping |
 
 
-Chi tiết: xem `PHAN_CONG_NHOM.md`.
-
 ## Stack nhanh
 
 
@@ -41,7 +39,6 @@ Chi tiết: xem `PHAN_CONG_NHOM.md`.
 ```text
 cloud/
 ├── README.md
-├── PHAN_CONG_NHOM.md
 ├── docker-compose.yml              ← Bảo merge
 ├── web-frontend-server/            ← Hân (React)
 ├── internal-dns-server/            ← Hân

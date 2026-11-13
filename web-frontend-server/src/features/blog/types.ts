@@ -1,5 +1,6 @@
 export interface BlogPost {
   id: string
+  htmlFile: `blog${number}.html`
   title: string
   category: string
   excerpt: string

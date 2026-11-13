@@ -21,7 +21,7 @@ import { config } from '../../shared/lib/config'
 const nav = [
   { to: '/', label: 'Trang chủ' },
   { to: '/rooms', label: 'Tìm phòng' },
-  { to: '/blog', label: 'Góc sinh viên' },
+  { to: '/blog/', label: 'Góc sinh viên' },
   { to: '/students', label: 'Sinh viên' },
 ]
 
@@ -50,17 +50,23 @@ export function AppLayout() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
-  const links = nav.map((item) => (
-    <NavLink
-      key={item.to}
-      to={item.to}
-      end={item.to === '/'}
-      onClick={() => setMenuOpen(false)}
-      className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-    >
-      {item.label}
-    </NavLink>
-  ))
+  const links = nav.map((item) =>
+    item.to === '/blog/' ? (
+      <a key={item.to} href={item.to} className="nav-link" onClick={() => setMenuOpen(false)}>
+        {item.label}
+      </a>
+    ) : (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        end={item.to === '/'}
+        onClick={() => setMenuOpen(false)}
+        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+      >
+        {item.label}
+      </NavLink>
+    ),
+  )
   return (
     <>
       <ScrollProgress />
@@ -245,7 +251,7 @@ export function AppLayout() {
               <div className="flex flex-col gap-2 text-sm text-muted">
                 <Link to="/rooms">Tìm phòng phù hợp</Link>
                 <Link to="/rooms?saved=true">Phòng bạn đã lưu</Link>
-                <Link to="/blog">Góc nhỏ sinh viên</Link>
+                <a href="/blog/">Góc nhỏ sinh viên</a>
               </div>
             </div>
             <div>

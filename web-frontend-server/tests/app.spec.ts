@@ -74,15 +74,83 @@ test('details support deep links, gallery and missing rooms', async ({ page }) =
   await expect(page.getByText('Không tìm thấy phòng này.')).toBeVisible()
 })
 
-test('three complete blog articles and search are available', async ({ page }) => {
+test('four static blog articles support search, categories and deep links', async ({ page }) => {
   await page.goto('/blog/')
-  await expect(page.locator('article')).toHaveCount(3)
-  await page.getByRole('textbox', { name: 'Tìm bài viết' }).fill('ngân sách')
+  await expect(page.locator('article')).toHaveCount(4)
+  await page.screenshot({ path: 'test-results/blog-desktop.png', fullPage: true })
+  await page.getByRole('button', { name: 'Hướng dẫn thuê trọ', exact: true }).click()
+  await expect(page.locator('article')).toHaveCount(1)
+  await expect(page.locator('article')).toContainText('Hướng dẫn thuê trọ lần đầu')
+  await page.getByRole('button', { name: 'Tất cả', exact: true }).click()
+  await page.getByRole('searchbox', { name: 'Tìm bài viết' }).fill('khong-co-bai-nao')
+  await expect(page.getByText('Chưa tìm thấy bài viết phù hợp.')).toBeVisible()
+  await page.getByRole('searchbox', { name: 'Tìm bài viết' }).fill('mot thang o tro')
+  await expect(page.locator('article')).toHaveCount(1)
+  await page.getByRole('searchbox', { name: 'Tìm bài viết' }).fill('Một tháng ở trọ')
   await expect(page.locator('article')).toHaveCount(1)
   await page.getByRole('link', { name: 'Đọc bài viết' }).click()
-  await expect(page.locator('article section')).toHaveCount(3)
+  await expect(page).toHaveURL(/\/blog\/blog3\.html$/)
+  await expect(page.locator('.blog-article section')).toHaveCount(6)
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Một tháng ở trọ')
+  await page.screenshot({ path: 'test-results/blog-article-desktop.png', fullPage: true })
+  await page.getByRole('link', { name: 'Về góc nhỏ sinh viên' }).click()
+  await expect(page.locator('article')).toHaveCount(4)
+})
+
+test('all blog content and navigation work without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 390, height: 844 },
+  })
+  const page = await context.newPage()
+  try {
+    await page.goto('http://127.0.0.1:4173/blog/')
+    await expect(page.locator('article')).toHaveCount(4)
+    await expect(page.getByRole('searchbox', { name: 'Tìm bài viết' })).toBeHidden()
+    await page.screenshot({ path: 'test-results/blog-mobile-no-js.png', fullPage: true })
+    for (const number of [1, 2, 3, 4]) {
+      const response = await page.goto(`http://127.0.0.1:4173/blog/blog${number}.html`)
+      expect(response?.status()).toBe(200)
+      expect(await response!.text()).toContain('<article class="blog-article')
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+      expect(await page.locator('.blog-article section').count()).toBeGreaterThanOrEqual(5)
+      await expect(page.locator('.blog-article > img')).toBeVisible()
+      expect(
+        await page
+          .locator('.blog-article > img')
+          .evaluate((image) => (image as HTMLImageElement).naturalWidth),
+      ).toBeGreaterThan(0)
+      await expect(page.locator('.blog-article a[href="/"]')).toBeVisible()
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      )
+      if (number === 4)
+        await page.screenshot({
+          path: 'test-results/blog-article-mobile-no-js.png',
+          fullPage: true,
+        })
+    }
+    await page.getByRole('link', { name: 'Về góc nhỏ sinh viên' }).click()
+    await expect(page.locator('article')).toHaveCount(4)
+    await page.getByLabel('Mở menu', { exact: true }).click()
+    await expect(page.getByRole('navigation', { name: 'Điều hướng di động' })).toBeVisible()
+  } finally {
+    await context.close()
+  }
+})
+
+test('home links open static blog pages and old slugs redirect', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('link', { name: 'Ghé thăm blog' }).click()
+  await expect(page).toHaveURL(/\/blog\/$/)
+  await expect(page.locator('article')).toHaveCount(4)
+  await page.goto('/')
+  await page.locator('.blog-rail a').first().click()
+  await expect(page).toHaveURL(/\/blog\/blog1\.html$/)
+  await expect(page.locator('.blog-article')).toBeVisible()
+  await page.goto('/blog/huong-dan-thue-tro-lan-dau')
+  await expect(page).toHaveURL(/\/blog\/blog4\.html$/)
 })
 
 test('students paginate and search without a backend', async ({ page }) => {

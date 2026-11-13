@@ -1,0 +1,121 @@
+@import '../../../index.css';
+@import '../../../App.css';
+
+/* Reuse MiniHome's typography, cards and editorial layout without React. */
+[hidden] {
+  display: none !important;
+}
+.blog-icon {
+  display: inline-block;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
+}
+.header-favorites .blog-icon {
+  width: 20px;
+  height: 20px;
+}
+.blog-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  padding: 5px 14px;
+  background: white;
+  color: var(--color-navy);
+  font: inherit;
+  font-size: 14px;
+  transition:
+    background 180ms,
+    border-color 180ms;
+}
+.blog-button:hover {
+  border-color: var(--color-brand);
+}
+.blog-button-primary,
+.blog-button[aria-pressed='true'] {
+  background: var(--color-navy);
+  border-color: var(--color-navy);
+  color: white;
+}
+.blog-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 256px;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 5px 11px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: white;
+  color: var(--color-muted);
+}
+.blog-search:focus-within {
+  border-color: var(--color-brand);
+}
+.blog-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-navy);
+  font: inherit;
+  font-size: 14px;
+}
+.blog-search input:focus-visible {
+  outline-offset: 2px;
+}
+.blog-empty {
+  padding: 64px 16px;
+  text-align: center;
+  color: var(--color-muted);
+}
+.blog-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-muted);
+}
+.blog-breadcrumb a:hover {
+  color: var(--color-brand);
+}
+.blog-article h1,
+.blog-article h2 {
+  overflow-wrap: anywhere;
+}
+.blog-mobile-menu summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 6px;
+  font-size: 22px;
+  line-height: 1;
+}
+.blog-mobile-menu summary::-webkit-details-marker {
+  display: none;
+}
+.blog-mobile-menu nav {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  border-bottom: 1px solid var(--color-line);
+  background: white;
+  box-shadow: 0 12px 24px #203b4b12;
+}
+@media (max-width: 639px) {
+  .blog-search {
+    width: 100%;
+  }
+  .blog-toolbar .blog-button {
+    font-size: 12px;
+    padding-inline: 10px;
+  }
+}

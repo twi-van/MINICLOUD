@@ -242,9 +242,9 @@ export default function HomePage() {
               <h2>Ở hay hơn, sống vui hơn</h2>
               <p>Chút kinh nghiệm nhỏ cho hành trình tự lập thật lớn.</p>
             </div>
-            <Link to="/blog" className="text-link">
+            <a href="/blog/" className="text-link">
               Ghé thăm blog <ArrowRightOutlined />
-            </Link>
+            </a>
           </Reveal>
           <HorizontalRail className="blog-rail" label="Bài viết sinh viên, kéo ngang để xem thêm">
             {posts.map((post) => (

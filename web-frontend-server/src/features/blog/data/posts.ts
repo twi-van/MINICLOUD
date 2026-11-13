@@ -1,9 +1,10 @@
-import type { BlogPost } from '../types'
+import type { BlogPost } from '../types.ts'
 
-// Editorial content stays local. Introduce a blog service when a CMS contract exists.
+// Shared by the home cards and the static HTML generator in scripts/generate-blog.ts.
 export const posts: BlogPost[] = [
   {
     id: 'cam-nang-tim-tro',
+    htmlFile: 'blog1.html',
     title: 'Lần đầu tìm trọ? Bắt đầu từ những điều nhỏ nhất',
     category: 'Cẩm nang tìm trọ',
     excerpt:
@@ -41,6 +42,7 @@ export const posts: BlogPost[] = [
   },
   {
     id: 'goc-hoc-tap',
+    htmlFile: 'blog2.html',
     title: 'Checklist đồ dùng cho phòng trọ: mua đủ, sống gọn',
     category: 'Không gian sống',
     excerpt:
@@ -78,6 +80,7 @@ export const posts: BlogPost[] = [
   },
   {
     id: 'ngan-sach-sinh-vien',
+    htmlFile: 'blog3.html',
     title: 'Một tháng ở trọ: lên ngân sách sao cho vừa đủ?',
     category: 'Đời sống sinh viên',
     excerpt:
@@ -120,6 +123,7 @@ export const posts: BlogPost[] = [
   },
   {
     id: 'huong-dan-thue-tro-lan-dau',
+    htmlFile: 'blog4.html',
     title: 'Hướng dẫn thuê trọ lần đầu: từ tìm phòng đến nhận chìa khóa',
     category: 'Hướng dẫn thuê trọ',
     excerpt:

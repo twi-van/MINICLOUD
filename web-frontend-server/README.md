@@ -33,8 +33,8 @@ Kiểm thử E2E dùng Google Chrome đã cài. Có thể chọn Edge qua biến
 | `/rooms`              | 8 phòng mẫu, tìm kiếm không dấu, bộ lọc kết hợp, sắp xếp, phân trang         |
 | `/rooms?saved=true`   | Phòng yêu thích; lưu ID trong localStorage                                   |
 | `/rooms/:id`          | Chi tiết, ảnh phóng to, lưu/chia sẻ, hẹn xem phòng demo                      |
-| `/blog/`              | 3 bài đầy đủ, lọc chủ đề và tìm kiếm                                         |
-| `/blog/:slug`         | Nội dung bài viết và bài liên quan                                           |
+| `/blog/`              | Danh sách 4 bài HTML tĩnh, lọc chủ đề và tìm kiếm                              |
+| `/blog/blog1.html` … `/blog/blog4.html` | Bài viết HTML đầy đủ, ảnh, bài liên quan, liên kết về trang chủ |
 | `/login`, `/register` | Đăng nhập Keycloak/PKCE; hướng dẫn cấp tài khoản, mock tùy chọn             |
 | `/students`           | 5 sinh viên đúng JSON mẫu, tìm tên, lọc ngành, sắp xếp GPA                   |
 
@@ -79,6 +79,12 @@ src/
 
 Luồng dữ liệu: **page → service → mock hoặc HTTP → DTO**. Components không import trực tiếp dữ liệu phòng/sinh viên mẫu. Blog là nội dung biên tập tĩnh theo yêu cầu đề bài, chưa có contract CMS. Auth dùng Keycloak khi cấu hình chế độ thật; lịch hẹn vẫn là trải nghiệm giao diện, chưa có API đặt lịch.
 
+### Blog HTML theo đề
+
+`src/features/blog/data/posts.ts` là nguồn nội dung chung cho thẻ bài viết ở Home và 4 bài HTML. Khi khởi động Vite hoặc build, `scripts/generate-blog.ts` tạo `blog/index.html` và `blog/blog1.html` đến `blog/blog4.html`. Sửa nội dung trong `posts.ts`, rồi khởi động lại dev server hoặc build để cập nhật HTML; không sửa trực tiếp các file được sinh.
+
+Vite build các trang này thành `dist/blog/`, đóng gói CSS, font và JavaScript tìm kiếm/lọc riêng, không cần React để đọc blog. Tắt JavaScript vẫn xem được danh sách, toàn bộ bài viết, ảnh và các liên kết. Giao diện dùng lại CSS MiniHome hiện tại. Các link blog trong React dùng thẻ `<a>` để mở đúng trang HTML. Link slug cũ được chuyển hướng 301 sang file tương ứng.
+
 ## Chuyển sang backend thật
 
 Trong `.env.local`:
@@ -117,7 +123,16 @@ cd web-frontend-server
 docker compose up -d --build
 ```
 
-Truy cập `http://localhost:8080`, `/blog/`, `/rooms/1` đều được Nginx fallback về React khi refresh. Compose riêng chỉ chạy frontend, gắn `cloud-net`; không thay compose gốc của Bảo. Image build nhiều stage: Node build → Nginx phục vụ `dist`.
+Truy cập `http://localhost:8080`: `/` và `/rooms/1` dùng React; `/blog/` và `/blog/blog1.html` đến `/blog/blog4.html` được Nginx phục vụ trực tiếp qua `alias /usr/share/nginx/html/blog/`. Blog không fallback về React; file blog không tồn tại trả 404. Compose riêng chỉ chạy frontend, gắn `cloud-net`; không thay compose gốc của Bảo. Image build nhiều stage: Node build → Nginx phục vụ `dist`.
+
+Kiểm tra blog sau khi build và chạy Docker:
+
+```bash
+curl -I http://localhost:8080/blog/
+curl -I http://localhost:8080/blog/blog1.html
+curl -I http://localhost:8080/blog/blog4.html
+curl -I http://localhost:8080/blog/khong-ton-tai.html # 404
+```
 
 `VITE_*` được nhúng lúc **build**. Sau khi đổi nguồn dữ liệu hoặc thông số Keycloak cần build lại. Dockerfile frontend mặc định dùng API và Keycloak thật, cùng upstream `application-backend-server-1:8081` trên mạng stack hiện có; không chỉnh Compose gốc. Compose riêng trong thư mục frontend vẫn mặc định mock và dùng `host.docker.internal:8085` cho backend trên host. Gateway do Vân phụ trách chia tải API ở cổng 80.
 

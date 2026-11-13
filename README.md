@@ -20,7 +20,7 @@ Mô phỏng hạ tầng cloud thu nhỏ (**9 loại server**) bằng Docker, m�
 
 | Server          | Công nghệ                       |
 | --------------- | ------------------------------- |
-| Web             | React build → Nginx             |
+| Web             | React build → Nginx (MPA + SPA) |
 | App             | NestJS (scale ≥ 2 instance)     |
 | Database        | PostgreSQL                      |
 | Auth            | Keycloak (login trên UI)        |
@@ -29,7 +29,7 @@ Mô phỏng hạ tầng cloud thu nhỏ (**9 loại server**) bằng Docker, m�
 | Monitoring      | Prometheus + Node Exporter      |
 | Visualization   | Grafana + Loki + Promtail       |
 | Proxy / LB      | Nginx (route + Round Robin app & web) |
-| Thêm (tuỳ chọn) | Redis, Alertmanager…            |
+| Cache (thêm)    | Redis                           |
 
 
 
@@ -37,19 +37,22 @@ Mô phỏng hạ tầng cloud thu nhỏ (**9 loại server**) bằng Docker, m�
 ## Cấu trúc
 
 ```text
-cloud/
+MINICLOUD/
 ├── README.md
-├── docker-compose.yml              ← Bảo merge
-├── web-frontend-server/            ← Hân (React)
-├── internal-dns-server/            ← Hân
-├── api-gateway-proxy-server/       ← Vân
-├── application-backend-server/     ← Vân (NestJS)
-├── relational-database-server/     ← Lợi (Postgres)
-├── authentication-identity-server/ ← Lợi
-├── object-storage-server/          ← Lợi
-├── monitoring-prometheus-server/   ← Bảo
-├── monitoring-grafana-dashboard-server/ ← Bảo
-└── docs/                           ← báo cáo Word (nếu có)
+├── docker-compose.yml                      ← Bảo merge (toàn bộ 9+ service)
+├── web-frontend-server/                    ← Hân (React + Vite, build MPA)
+├── internal-dns-server/                    ← Hân (Bind9)
+├── api-gateway-proxy-server/               ← Vân (Nginx proxy + LB)
+├── application-backend-server/             ← Vân (NestJS)
+├── relational-database-server/             ← Lợi (Postgres)
+│   └── init/                               ← SQL init + studentdb shell
+├── authentication-identity-server/         ← Lợi (Keycloak)
+│   └── realm/                              ← realm_52400211.json + minicloud-realm.json
+├── object-storage-server/                  ← Lợi (MinIO)
+│   └── seed/                               ← ảnh phòng mẫu (room-1..6.jpg, avatar)
+├── monitoring-prometheus-server/           ← Bảo
+├── monitoring-grafana-dashboard-server/    ← Bảo (Grafana + Loki + Promtail)
+└── docs/                                   ← báo cáo Word
 ```
 
 
@@ -57,18 +60,21 @@ cloud/
 ## Cổng dịch vụ
 
 
-| Service                  | Port host                    |
-| ------------------------ | ---------------------------- |
-| Proxy (API Gateway)      | 80                           |
-| Web                      | 8080                         |
-| Auth (Keycloak)          | 8081                         |
-| App API (instance 1 / 2) | 8085 / 8086 (container 8081) |
-| Grafana                  | 3000                         |
-| MinIO API / Console      | 9000 / 9001                  |
-| Prometheus               | 9090                         |
-| Node Exporter            | 9100                         |
-| DNS                      | 1053/udp · 1053/tcp          |
-| PostgreSQL               | 5432                         |
+| Service                   | Port host                                     |
+| ------------------------- | --------------------------------------------- |
+| Proxy (API Gateway)       | **80**                                        |
+| Web (instance 1)          | 8080                                          |
+| Web (instance 2)          | 8083                                          |
+| Auth (Keycloak)           | 8081 (host) → container 8080                  |
+| App API (instance 1 / 2)  | 8085 / 8086 (container 8081)                  |
+| Grafana                   | 3000                                          |
+| Loki                      | 3100                                          |
+| MinIO API / Console       | 9000 / 9001                                   |
+| Prometheus                | 9090                                          |
+| Node Exporter             | 9100                                          |
+| Redis                     | 6379                                          |
+| DNS                       | 1053/udp · 1053/tcp                           |
+| PostgreSQL                | 5432                                          |
 
 
 
@@ -76,13 +82,14 @@ cloud/
 ## Tài khoản demo (mặc định)
 
 
-| Dịch vụ            | User                     | Password      |
-| ------------------ | ------------------------ | ------------- |
-| Keycloak           | admin                    | admin         |
-| Grafana            | admin                    | admin         |
-| MinIO              | minioadmin               | minioadmin    |
-| PostgreSQL         | minicloud                | minicloud_dev |
-| Keycloak sinh viên | sv01, sv02, student_demo | 123456        |
+| Dịch vụ                       | User                                                | Password      |
+| ----------------------------- | --------------------------------------------------- | ------------- |
+| Keycloak admin                | admin                                               | admin         |
+| Grafana                       | admin                                               | admin         |
+| MinIO                         | minioadmin                                          | minioadmin    |
+| PostgreSQL (`minicloud`)      | minicloud                                           | minicloud_dev |
+| Keycloak realm `realm_52400211` | sv01, sv02, student_demo                          | 123456        |
+| Keycloak client               | `web-frontend` (React), `flask-app` (đề lab)        | —             |
 
 
 
@@ -91,7 +98,7 @@ cloud/
 
 Yêu cầu: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-**Sprint 2–3 — App × 2 (LB) + Proxy + Web:** từ thư mục gốc repo:
+**Sprint 2–3 — App × 2 (LB) + Proxy + Web × 2:** từ thư mục gốc repo:
 
 `docker-compose.yml` tự tạo mạng `cloud-net` (`172.20.0.0/16`, khớp zone Bind9). Máy sạch chỉ cần `compose up`. Nếu máy đã có `cloud-net` tạo tay và Compose báo lỗi mạng, chạy `docker compose down` rồi `docker network rm cloud-net` trước khi `up` lại.
 
@@ -131,7 +138,7 @@ Chạy cả stack (khi đã merge đủ service):
 docker compose up -d --build
 docker compose ps
 
-# Ảnh phòng, avatar và PDF bucket documents (script tự tạo PDF, không có file PDF trong git)
+# Seed ảnh phòng (rooms-images bucket) và avatar (profile-pics bucket) vào MinIO
 bash object-storage-server/seed-rooms.sh
 ```
 
@@ -154,13 +161,20 @@ curl http://localhost/student/
 curl http://localhost/api/rooms
 curl -I http://localhost/
 curl -I http://localhost/auth/
-curl -I http://localhost/blog/blog1.html
+curl -I http://localhost/minio/
 curl -I http://localhost:8080/metrics
 curl -s http://localhost/lb-demo; echo
 
 # Web / App trực tiếp
 curl -I http://localhost:8080/
 curl -s http://localhost:8085/hello
+
+# Blog tĩnh (4 bài + index)
+curl -I http://localhost/blog/
+curl -I http://localhost/blog/blog1.html   # Lần đầu tìm trọ
+curl -I http://localhost/blog/blog2.html   # Checklist đồ dùng
+curl -I http://localhost/blog/blog3.html   # Ngân sách sinh viên
+curl -I http://localhost/blog/blog4.html   # Hướng dẫn thuê trọ lần đầu
 
 # DNS (kỳ vọng trùng IP tĩnh compose, vd web → 172.20.0.10)
 dig @127.0.0.1 -p 1053 web-frontend-server.cloud.local +short
@@ -169,15 +183,20 @@ dig @127.0.0.1 -p 1053 minio.cloud.local +short
 dig @127.0.0.1 -p 1053 keycloak.cloud.local +short
 ```
 
-- App / Login: http://localhost/ · http://localhost/login  
-- Blog tĩnh theo đề: http://localhost/blog/blog1.html · blog2.html · blog3.html  
-- Keycloak admin: http://localhost:8081/auth/admin/master/console/  
-- Keycloak qua proxy: http://localhost/auth/ — realm demo đề: `realm_52400211` (client `flask-app`, user `sv01`/`sv02`)  
-- Prometheus: http://localhost:9090 → Status → Targets (có job `web`)  
-- Grafana: http://localhost:3000 — dashboard `System Health of 52400102`  
-- MinIO Console: http://localhost:9001  
-- PDF MinIO: http://localhost:9000/documents/bao-cao.pdf  
-- Database đề: `studentdb.students` (`student_id`, `fullname`, `dob`, `major`). App `/student` đọc `students.json`; `/api/students-db` đọc Postgres `studentdb`.
+- App / Login / Register: http://localhost/ · http://localhost/login · http://localhost/register
+- Danh sách phòng: http://localhost/rooms · Chi tiết: http://localhost/rooms/:id
+- Sinh viên: http://localhost/students
+- Blog tĩnh (đề — 4 bài):
+  - http://localhost/blog/ (trang danh sách)
+  - http://localhost/blog/blog1.html · /blog/blog2.html · /blog/blog3.html · /blog/blog4.html
+- Keycloak admin: http://localhost:8081/auth/admin/master/console/
+- Keycloak qua proxy: http://localhost/auth/ — realm đề: `realm_52400211` (client `flask-app`, user `sv01`/`sv02`); client React: `web-frontend`
+- Prometheus: http://localhost:9090 → Status → Targets (jobs: `web`, `application-backend`, `node`, `grafana`, `loki`, `prometheus`)
+- Grafana: http://localhost:3000 — dashboard `System Health of 52400102`
+- MinIO Console: http://localhost:9001
+- MinIO qua proxy: http://localhost/minio/rooms-images/room-1.jpg
+- Database đề `studentdb`: bảng `students` (`student_id`, `fullname`, `dob`, `major`). App `/api/students-db` đọc Postgres `studentdb`; `/api/student` đọc `students.json` (file tĩnh).
+- Database chính `minicloud`: bảng `rooms`, `users`, `students`, `bookings`.
 
 ## Link nộp
 
